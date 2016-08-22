@@ -8,7 +8,7 @@ module.exports = {
     ],
     entry:  './src',
     output: {
-        path:     './',
+        path:     '/mnt/Webstuff/html/Devel/Webpack2',
         filename: 'bundle.js',
     }
 };
