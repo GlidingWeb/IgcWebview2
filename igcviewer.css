@@ -1,0 +1,317 @@
+body {
+   font-style: normal;
+	font-family: Tahoma, Geneva, sans-serif;
+	background: #F4F4FF;
+	color: #404040;
+        font-size: 1.0em;
+}
+
+h1  {
+    text-align: center;
+}
+
+h3 {
+     text-align: center;
+     font-size: 1.2em;
+}
+
+div.notnow  {
+    visibility: hidden;
+}
+
+#requestdata {
+     line-height: 2.5em;
+}
+
+#requestdata input[type="text"]  {
+    width: 12em;
+}
+
+#titlediv  p  {
+   text-align: center;
+}
+
+#map {
+    width: 100%;
+    height: 85vh;
+    margin-bottom: 15px;
+}
+
+#slider label {
+    width: 6em;
+    vertical-align: top;
+}
+  
+#slider input[type='range'] {
+    width: calc(100% - 6em);
+    padding-bottom: 0px; /* Default padding is huge in Internet Explorer.*/
+}
+
+#mapWrapper, #barogram {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#barogram, #map  {
+   max-height: 110vw;
+}
+
+#barogram {
+   cursor: crosshair;
+}
+
+#taskinfo td   {
+   padding: 0px 20px;    
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+    input[name="tasksource"] {
+    margin-right: 40px;
+}
+    
+@media print, screen and (max-width: 1100px) {
+ div.halfwidth   {
+        display: block;
+        width: 90%;
+        margin-left: auto;
+      margin-right: auto;
+    }   
+    
+    h2 {
+        display: inline-block;
+        height: 35px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    
+    button.toggle {
+        float:right;
+    }
+    
+    #mapWrapper {
+        position: relative;
+    }
+    
+    
+    #barogram {
+        height: calc(90vh - 130px);
+        position: relative;
+    }
+    
+   button,  .inbutton  {
+    height: 35px;
+    font-size: 20px;
+    margin: 5px;
+    }
+}
+
+#setunits   select {
+position: absolute;
+left: 10em;
+}
+
+@media screen and (min-width: 1100px) {
+    div.halfwidth   {
+        display: inline-block;
+        width: calc(50% - 30px);
+        padding-left:  10px;
+        padding-right: 10px;
+    }
+
+    button.toggle {
+        display: none;
+    }
+
+  #help, #about {
+  position: absolute;
+  top:10px;
+  font-weight: bold;
+  }
+
+  #about {
+  right: 10px;
+  }
+    
+    #mapWrapper {
+        margin-left: 30px;
+        float: left;
+    }
+
+    #barogram {
+        height: 90vh;
+        position: absolute;
+        right: 0px;
+        clear: both;
+    }
+}
+
+#errorMessage {
+    font-weight: bold;
+    color: Red;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#igcFileDisplay {
+    clear: both;
+}
+
+table#headerInfo {
+    border-spacing: 0.1em ;
+}
+
+#task, #taskentry  {
+   display: none;
+   width: 100%;
+}
+
+#airspace_info, #flightinfo  {
+display: none;
+}
+
+#headerInfo th {
+    text-align: left;
+    font-weight: bold;
+}
+
+#flightInfo  {
+   float: right;
+   margin-bottom: 20px;
+   padding-top: 20px;
+}
+
+#taskdata  {
+  display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 18em;
+    height: 370px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+   text-align: center;
+  z-index: 2000;
+  background-color: white;
+}
+
+#positionDetail  {
+  display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 18em;
+    height: 370px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+   text-align: center;
+  z-index: 2000;
+  background-color: white;
+}
+
+#sectordefs  {
+  display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 22em;
+    height: 400px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+     font-size: 0.9em;
+  z-index: 2000;
+  background-color: white;
+}
+
+#sectordefs input[type='text'] {
+   width: 3em;
+}
+
+button.floatright {
+float: right;
+}
+
+#setenl  {
+  display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 18em;
+    height: 350px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+     font-size: 0.9em;
+  z-index: 2000;
+  background-color: white;
+}
+
+#setaltref  {
+    position: fixed;
+    display: none;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 18em;
+    height: 400px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+     font-size: 0.9em;
+  z-index: 2000;
+  background-color: white;
+}
+
+#setunits  {
+    position: fixed;
+    display: none;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 18em;
+    height: 350px;
+    padding: 15px;
+    margin: auto;
+     border-style: solid;
+     border-width: 2px;
+     overflow: auto;
+     font-size: 0.9em;
+  z-index: 2000;
+  background-color: white;
+}
+
+#enlthreshold, #enltime  {
+width: 4ch;
+}
+
+@-ms-viewport  {
+    width: extend-to-zoom;
+    zoom: 1.0;
+}

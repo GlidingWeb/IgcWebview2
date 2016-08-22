@@ -1,0 +1,26 @@
+{
+  "name": "flightview",
+  "version": "1.0.0",
+  "description": "Modularised version of IGCWebview",
+  "main": "src/index.js",
+  "dependencies": {
+  "jquery": "^1.11"
+  },
+  "devDependencies": {
+  "webpack": "^1.12.14"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https:/github.com/GlidingWeb/FlightView"
+  },
+  "keywords": [
+    "IGC",
+    "Soaring",
+    "Gliding"
+  ],
+  "author": "Richard Brisbourne and Alistair Green",
+  "license": "MIT"
+}
