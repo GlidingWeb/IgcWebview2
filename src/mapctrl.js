@@ -50,8 +50,8 @@ function drawLine(centre,bearing,length) {
    var utils=require('./utilities');
   var brng1 = (bearing + 270) % 360;
   var brng2 = (bearing + 90) % 360;
-  var linestart= utils.targetPoint(centre, length/2, brng1);
-  var lineend = utils.targetPoint(centre, length/2, brng2);
+  var linestart= utils.targetPoint(centre, length, brng1);
+  var lineend = utils.targetPoint(centre, length, brng2);
   var targetLine = new google.maps.Polyline({
         path: [linestart, lineend],
         strokeColor: 'black',
@@ -214,7 +214,9 @@ setAirspace:  function(airdata) {
     var sector;
     zapSectors();
     var task=require('./task');
+    if(task.names.length > 0) {
     var prefs=require('./preferences').sectors;
+    console.log("Drawing " + prefs.finishtype);
     line= drawLine(task.coords[0],task.bearing[1],prefs.startrad);
     sectorfeatures.push(line);
     for(i=1;i < task.names.length-1;i++) {
@@ -227,10 +229,16 @@ setAirspace:  function(airdata) {
            sectorfeatures.push(sector);
         }
     }
-    line= drawLine(task.coords[task.names.length-1],task.bearing[task.names.length-1],prefs.finrad);
-    sectorfeatures.push(line);
+    if(prefs.finishtype==='line') {
+       finish = drawLine(task.coords[task.names.length-1],task.bearing[task.names.length-1],prefs.finrad);
+    }
+    else {
+        finish=sectorCircle(task.coords[task.names.length-1],prefs.finrad);
+    }
+    sectorfeatures.push(finish);
     for(i=0; i < sectorfeatures.length; i++) {
         sectorfeatures[i].setMap(mapObj);
+    }
     }
 },
     

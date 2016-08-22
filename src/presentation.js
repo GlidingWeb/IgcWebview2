@@ -64,11 +64,50 @@ function getFromPlanner(source) {
 
 module.exports={
     
+setSectors: function () {
+    var sectors= {
+    startrad : $('#startrad').val(),
+    finrad: $('#finishrad').val(),
+    tprad:  $('#tpbarrelrad').val(),
+    sector_rad: $('#tpsectorrad').val(),
+    sector_angle:  $('#subtends').val(),
+   use_sector:  $('#tpsector').prop('checked'),
+    use_barrel:  $('#tpbarrel').prop('checked'),
+    finishtype:  $("input[name=finishtype]:checked").val()
+};
+
+var saveit=$('#savesectors').prop('checked');
+if(prefs.setSectors(sectors,saveit)) {
+    mapControl.addSectors();
+    $('#sectordefs').hide();
+}
+},
+    
 showImported: function(points) {
     enterTask(points,true);
 },
-    
-showStoredValues: function() {
+
+showSectorPreferences() {
+ $('#startrad').val(prefs.sectors.startrad);
+ $('#finishrad').val(prefs.sectors.finrad);
+ $('#tpbarrelrad').val(prefs.sectors.tprad);
+ $('#tpsectorrad').val(prefs.sectors.sector_rad);
+$('#subtends').val(prefs.sectors.sector_angle);
+   if(prefs.sectors.use_sector) {
+        $('#tpsector').prop('checked',true);
+   }
+    if(prefs.sectors.use_barrel) {
+        $('#tpbarrel').prop('checked',true);
+    }
+    if(prefs.sectors.finishtype==='line') {
+       $("input[name=finishtype][value='line']").prop("checked",true);
+    }
+    else {
+              $("input[name=finishtype][value='circle']").prop("checked",true);
+    }
+},
+
+showPreferences: function() {
     $('#altitudeunits').val(prefs.units.altitude);
     $('#lengthunits').val(prefs.units.distance);
      $('#climbunits').val(prefs.units.climb);
