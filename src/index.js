@@ -21,7 +21,7 @@ var script = document.createElement('script');
   document.body.appendChild(script);
 
   preference.getStoredValues();
-  present.showStoredValues();
+  present.showPreferences();
   
   $("#igc").prop("checked", true);  //Firefox ignores markup on refresh
   
@@ -106,38 +106,33 @@ var script = document.createElement('script');
     });
     
     $('input[type=radio][name=tasksource]').change(function () {
-       // var task=require('./task');
-       // var mapCtrl= require('./mapctrl');
-       // task.clearTask();
-       // present.clearTask();
-        //mapCtrl.zapTask();
         preference.setTaskSource(this.id);
         present.replaceTask(this.id);
-        /*
-          $('#taskentry').hide();
-          $('#task').hide();
-          clearTask();
-          switch (this.value) {
-          case "infile":
-            if (igcFile) {
-              task = getFileTask();
-              if (task) {
-                showTask();
-              } else {
-                alert("No declaration found");
-              }
+    });
+    
+    $('#sectorconfig').click(function () {
+          $('#sectordefs').show();
+        });
+    
+      $('#setsectors').click(function () {
+          /*
+          if (sectorsRealityCheck()) {
+            $('#sectordefs').hide();
+            setSectors();
+            if ($('#savesectors').prop("checked")) {
+              storePreference("sectors", JSON.stringify(sectordefs));
             }
-            break;
-          case "user":
-            $('#taskentry').show();
-            break;
-          case "xcplan":
-            getFromPlanner(this.id);
-            break;
-          case "nix":
-            clearTask();
-            break;
           }
-*/
+          */
+          present.setSectors();
+        });
+
+    $('#cancelsectors').click(function () {
+          $(this).parent().hide();
+        });
+    
+    $('#tpdefaults').click(function(){
+        preference.setSectorDefaults();
+        present.showSectorPreferences();
     });
     
