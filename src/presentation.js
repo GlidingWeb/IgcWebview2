@@ -15,6 +15,15 @@ var barogram=require('./plotgraph');
       mapControl.zapTask();
  }
  
+ function showAltPreferences() {
+if(prefs.altPrefs.altsource==='P') {
+       $("#P").prop("checked", true);
+    }
+    else {
+        $('#G').prop('checked', true);
+    }
+ }
+ 
  function  enterTask(points,zoomto) {
      task.createTask(points);
     var distance=task.getTaskLength();
@@ -87,7 +96,7 @@ showImported: function(points) {
     enterTask(points,true);
 },
 
-showSectorPreferences() {
+showSectorPreferences: function() {
  $('#startrad').val(prefs.sectors.startrad);
  $('#finishrad').val(prefs.sectors.finrad);
  $('#tpbarrelrad').val(prefs.sectors.tprad);
@@ -114,6 +123,8 @@ showPreferences: function() {
      $('#cruiseunits').val(prefs.units.cruise);
      $('#taskunits').val(prefs.units.task);
     $('#airclip').val(prefs.airclip);
+    this.showSectorPreferences();
+    showAltPreferences();
 },
 
 getUserTask: function() {
@@ -143,15 +154,6 @@ getUserTask: function() {
          }
          $('#taskentry').hide();
      }
-    /*
-    if (taskdata.name.length > 1) {
-      if (success) {
-        return maketask(taskdata);
-      } else {
-        return null;
-      }
-    }
-    */
   },
 
 replaceTask: function(source) {
@@ -185,7 +187,7 @@ replaceTask: function(source) {
 },
 
 showPosition:  function(index) {
-    var altInfo=prefs.showAltitude(flight.pressureAltitude[index],flight.gpsAltitude[index],flight.baseElevation,flight.pressureAltitude[0],flight.gpsAltitude[0]);
+    var altInfo=prefs.showAltitude(flight.pressureAltitude[index],flight.gpsAltitude[index],flight.takeOff.pressure,flight.takeOff.gps,flight.baseElevation);
      var displaySentence=utils.unixToString((flight.recordTime[index] + flight.timeZone.offset + 86400)%86400) + ' ' + flight.timeZone. zoneAbbr + ': ';
     displaySentence+= altInfo.displaySentence;
     displaySentence+= ": " + utils.showFormat(flight.latLong[index]);
@@ -234,8 +236,7 @@ var _this=this;
                   $('#datecell').text(utils.showDate(flight.unixStart[0] + flight.timeZone.offset));
         } 
         if (elargs[0].status === 'OK') {
-          flight.baseElevation.valid=true;
-          flight.baseElevation.value = elargs[0].results[0].elevation;
+            flight.setBaseElevation(elargs[0].results[0].elevation);
         }
           barogram.plot();
         _this.showPosition(0);

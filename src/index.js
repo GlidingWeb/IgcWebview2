@@ -1,7 +1,5 @@
 // This is the entry point for the build.  Contains basic user interaction code.
 
-var preference=require('./preferences');
-var present=require('./presentation');
 
 window.ginit=function(){                            //Callback after maps api loads.  Must be in global scope
     var map=require('./mapctrl');
@@ -20,6 +18,9 @@ var script = document.createElement('script');
   script.src = 'https://maps.googleapis.com/maps/api/js?v=3&callback=ginit';
   document.body.appendChild(script);
 
+    $(document).ready(function () {
+    var preference=require('./preferences');
+   var present=require('./presentation');        
   preference.getStoredValues();
   present.showPreferences();
   
@@ -63,7 +64,7 @@ var script = document.createElement('script');
         });
           
       $('#help').click(function () {
-          alert( "You are running jQuery version: " + $.fn.jquery );
+          present.showPreferences();
         });
       
         $('#airclip').change(function() {
@@ -115,15 +116,6 @@ var script = document.createElement('script');
         });
     
       $('#setsectors').click(function () {
-          /*
-          if (sectorsRealityCheck()) {
-            $('#sectordefs').hide();
-            setSectors();
-            if ($('#savesectors').prop("checked")) {
-              storePreference("sectors", JSON.stringify(sectordefs));
-            }
-          }
-          */
           present.setSectors();
         });
 
@@ -136,3 +128,21 @@ var script = document.createElement('script');
         present.showSectorPreferences();
     });
     
+    $('#altref').click(function () {
+          $('#setaltref').show();
+        });
+    
+     $('#althelp').click(function () {
+          window.open("igchelp.html#alt", "_blank");
+        });
+
+      $('#restorealtref').click(function () {
+          $(this).parent().hide();
+        });
+
+      $('#applyaltref').click(function () {
+          preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(),$("input[name='altsource']").filter(':checked').val());
+          present.altChange(parseInt($('#timeSlider').val(),10));
+          $(this).parent().hide();
+        });
+    });
