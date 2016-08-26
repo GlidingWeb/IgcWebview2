@@ -9,7 +9,6 @@ var gpsAltitude= [];
 var recordTime= [];
 var fixQuality= [];
 var enl= [];
-var hasPressure;
 var taskpoints={
     names: [],
     coords: []
@@ -20,10 +19,11 @@ var timeZone= {
     offset: 0,
     zoneName: 'UTC'
 };
-var baseElevation={
-    valid: false,
-    value: 0
+var takeOff={
+    pressure: null,
+    gps: null
 };
+var baseElevation;
  
 function clearFlight() {
 headers.length=0;
@@ -35,7 +35,6 @@ fixQuality.length=0;
 enl.length=0;
 taskpoints.names.length=0;
 taskpoints.coords.length=0;
-hasPressure=0;
 unixStart.length=0;
 bounds.south=90;
 bounds.west=180;
@@ -44,7 +43,9 @@ bounds.east=-180;
 timeZone.zoneAbbr='UTC';
 timeZone.offset=0;
 timeZone.zoneName='UTC';
-baseElevation.valid=false;
+takeOff.pressure=null;
+takeOff.gps=null;
+baseElevation=null;
 }
      
 module.exports={
@@ -180,6 +181,7 @@ var utils=require("./utilities.js");
        var cRecords=[];
        var firstFix=0;
        var taskMatch;
+       var hasPressure=false;
       var positionRegex = /^B([\d]{6})([\d]{7}[NS][\d]{8}[EW])([AV])([-\d][\d]{4})([-\d][\d]{4})/; 
       var taskRegex = /^C([\d]{7})[NS]([\d]{8})[EW].*/;
       clearFlight();
@@ -252,9 +254,22 @@ var utils=require("./utilities.js");
                 break;
           }
         }
+if(hasPressure) {
+    takeOff.pressure=pressureAltitude[0];
+}
+i=0;
+while((i < latLong.length) && (fixQuality[i] !=='A')) {
+    i++;
+}
+takeOff.gps=gpsAltitude[i];
  unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]);    //This is the only place we use Javascript Date object, easiest way of getting the day of week
 getTaskPoints(cRecords);
 },
+
+setBaseElevation: function(elevation){
+    this.baseElevation=elevation;
+},
+
 timeZone: timeZone,                                                                 //values here persist, can be interrogated from other modules once this is "required"
 unixStart: unixStart,
 headers: headers,
@@ -264,9 +279,9 @@ gpsAltitude: gpsAltitude,
 recordTime: recordTime,
 fixQuality: fixQuality,
 enl: enl,
-hasPressure: hasPressure,
 taskpoints: taskpoints,
  bounds:  bounds,
+ takeOff:takeOff,
  baseElevation: baseElevation
 }
 

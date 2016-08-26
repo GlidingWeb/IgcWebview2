@@ -216,7 +216,6 @@ setAirspace:  function(airdata) {
     var task=require('./task');
     if(task.names.length > 0) {
     var prefs=require('./preferences').sectors;
-    console.log("Drawing " + prefs.finishtype);
     line= drawLine(task.coords[0],task.bearing[1],prefs.startrad);
     sectorfeatures.push(line);
     for(i=1;i < task.names.length-1;i++) {

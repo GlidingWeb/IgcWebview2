@@ -12,12 +12,10 @@ module.exports =  {
     var altitudeLabel;
     var plotColour;
     var barogramData=[];
-    var altOffset;
+    var altOffset=0;
     var flight=require('./igc');
     var prefs=require('./preferences');
     var multiplier;
-    
-    
     if(prefs.units.altitude==='ft') {
         multiplier=prefs.metre2foot;
         yaxisLabel= "Altitude (feet)";
@@ -26,27 +24,34 @@ module.exports =  {
          yaxisLabel= "Altitude (metres)";
          multiplier=1;
     }
-    if(prefs.altRefs.source==='P') {
-        altitudeLabel="Pressure Altitude";
-     plotColour = '#FF0000';
-       switch (prefs.altRefs.reference) {
-      case "QFE":
-        altitudeLabel += " (QFE takeoff)";
-        altOffset= -flight.pressureAltitude[0];
-        break;
-      case "QNH":
-        altitudeLabel += " (QNH)";
-        altOffset=flight.baseElevation-flight.pressureAltitude[0];
-        break;
-      case "std":
-        altitudeLabel += " (ref 1013mb)";
-        altOffset=0;
-        break;
+    
+    if(prefs.altPrefs.altref==='QNH') {
+        altOffset=flight.baseElevation;
+    }
+   
+    if(prefs.altPrefs.altsource==='P') {
+      altitudeLabel="Pressure Altitude";
+      plotColour = '#FF0000';
+      if(prefs.altPrefs.altref !=='std') {
+          altOffset-=flight.takeOff.pressure;
       }
-       for (j = 0; j < flight.recordTime.length; j++) {
+    for (j = 0; j < flight.recordTime.length; j++) {
         barogramData.push([1000*(flight.recordTime[j] + flight.timeZone.offset), multiplier*(flight.pressureAltitude[j]+altOffset)]);
       }
     }
+else {
+      altitudeLabel = "GPS Altitude";
+      plotColour = '#8080FF';
+    if(prefs.altPrefs.altref !=='std'){
+          altOffset-=flight.takeOff.gps;
+      }
+        for (j = 0; j < flight.recordTime.length; j++) {
+            if(flight.fixQuality[j] ==='A') {
+               barogramData.push([1000*(flight.recordTime[j] + flight.timeZone.offset), multiplier*(flight.gpsAltitude[j]+altOffset)]);
+            }
+      }
+}
+altitudeLabel = altitudeLabel + " (" +prefs.altPrefs.altref + ")";
     baro=new $.plot("#barogram", [ {
       label: altitudeLabel,
       data: barogramData,

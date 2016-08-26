@@ -15,10 +15,6 @@ h3 {
      font-size: 1.2em;
 }
 
-div.notnow  {
-    visibility: hidden;
-}
-
 #requestdata {
      line-height: 2.5em;
 }
@@ -72,6 +68,10 @@ div.notnow  {
 
     input[name="tasksource"] {
     margin-right: 40px;
+}
+
+.notnow {
+    visibility: hidden;
 }
     
 @media print, screen and (max-width: 1100px) {
