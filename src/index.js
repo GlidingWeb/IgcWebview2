@@ -1,148 +1,151 @@
 // This is the entry point for the build.  Contains basic user interaction code.
 
+(function () {
+  var apiKeys = require('./apikeys');
 
-window.ginit=function(){                            //Callback after maps api loads.  Must be in global scope
-    var map=require('./mapctrl');
-      map.initmap();
-}
-
-window.importTask=function(points) {
-    var present=require('./presentation');
-      console.log("imported");
-      present.showImported(points);
-      return "Task Entered";
+  window.ginit=function(){                            //Callback after maps api loads.  Must be in global scope
+  var map=require('./mapctrl');
+  map.initmap();
   }
 
-var script = document.createElement('script');
+  window.importTask=function(points) {
+  var present=require('./presentation');
+  console.log("imported");
+  present.showImported(points);
+  return "Task Entered";
+  }
+
+  var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src = 'https://maps.googleapis.com/maps/api/js?v=3&callback=ginit';
+  script.src = 'https://maps.googleapis.com/maps/api/js?v=3&key=' + apiKeys.googleMaps + '&callback=ginit';
   document.body.appendChild(script);
 
-    $(document).ready(function () {
-    var preference=require('./preferences');
-   var present=require('./presentation');        
+  $(document).ready(function () {
+  var preference=require('./preferences');
+  var present=require('./presentation');
   preference.getStoredValues();
   present.showPreferences();
-  
+
   $("#igc").prop("checked", true);  //Firefox ignores markup on refresh
-  
- $('#fileControl').change(function() {
 
-     if (this.files.length > 0) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-            //  try {                                                                //exception handling temporarily disabled till debugged
-                var igcFile=require('./igc');
-                 igcFile.initialise(this.result);
-                present.displayIgc();
-              /*  
-              } catch (ex) {
-                if (ex instanceof IGCException) {
-                  alert(ex.message);
-                } else {
-                  throw ex;
-                }
-              }
-       */       
-            };
-            reader.readAsText(this.files[0]);
-          }
-    });
-       
-        $('#timeSlider').on('input', function () {
-          var t = parseInt($(this).val(), 10);
-           present.showPosition(t);
-        });
+  $('#fileControl').change(function() {
 
-      $('#timeSlider').on('change', function () {
-          var t = parseInt($(this).val(), 10);
-          present.showPosition(t);
-        });
+  if (this.files.length > 0) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+  //  try {                                                                //exception handling temporarily disabled till debugged
+  var igcFile=require('./igc');
+  igcFile.initialise(this.result);
+  present.displayIgc();
+  /*
+  } catch (ex) {
+  if (ex instanceof IGCException) {
+  alert(ex.message);
+  } else {
+  throw ex;
+  }
+  }
+  */
+  };
+  reader.readAsText(this.files[0]);
+  }
+  });
 
-     $('#zoomtrack').click(function () {
-          present.zoomTrack();
-        });
-          
-      $('#help').click(function () {
-          present.showPreferences();
-        });
-      
-        $('#airclip').change(function() {
-          preference.setAirclip($(this).val());
-          present.airClipChange();
-      });
-      
-      $('#altitudeunits').change(function() {
-          preference.setAltUnits($(this).val());
-          present.altChange(parseInt($('#timeSlider').val(),10));
-      });
-      
-      $('#climbunits').change(function() {
-          preference.setClimbUnits($(this).val());
-      });
-      
-       $('#lengthunits').change(function() {
-          preference.setLengthUnits($(this).val());
-          present.lengthChange();
-      });
-      
-    $('#cruiseunits').change(function() {
-          preference.setCruiseUnits($(this).val());
-      });
-    
-    $('#taskunits').change(function() {
-          preference.setTaskUnits($(this).val());
-      });
-    
-     $('#unitconfig').click(function() {
-       $('#setunits').show();
-   });
-       
-    $('.closewindow').click(function () {
-          $(this).parent().hide();
-        });
-    
-    $('#enterTask').click(function(){
-        present.getUserTask();
-    });
-    
-    $('input[type=radio][name=tasksource]').change(function () {
-        preference.setTaskSource(this.id);
-        present.replaceTask(this.id);
-    });
-    
-    $('#sectorconfig').click(function () {
-          $('#sectordefs').show();
-        });
-    
-      $('#setsectors').click(function () {
-          present.setSectors();
-        });
+  $('#timeSlider').on('input', function () {
+  var t = parseInt($(this).val(), 10);
+  present.showPosition(t);
+  });
 
-    $('#cancelsectors').click(function () {
-          $(this).parent().hide();
-        });
-    
-    $('#tpdefaults').click(function(){
-        preference.setSectorDefaults();
-        present.showSectorPreferences();
-    });
-    
-    $('#altref').click(function () {
-          $('#setaltref').show();
-        });
-    
-     $('#althelp').click(function () {
-          window.open("igchelp.html#alt", "_blank");
-        });
+  $('#timeSlider').on('change', function () {
+  var t = parseInt($(this).val(), 10);
+  present.showPosition(t);
+  });
 
-      $('#restorealtref').click(function () {
-          $(this).parent().hide();
-        });
+  $('#zoomtrack').click(function () {
+  present.zoomTrack();
+  });
 
-      $('#applyaltref').click(function () {
-          preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(),$("input[name='altsource']").filter(':checked').val());
-          present.altChange(parseInt($('#timeSlider').val(),10));
-          $(this).parent().hide();
-        });
-    });
+  $('#help').click(function () {
+  present.showPreferences();
+  });
+
+  $('#airclip').change(function() {
+  preference.setAirclip($(this).val());
+  present.airClipChange();
+  });
+
+  $('#altitudeunits').change(function() {
+  preference.setAltUnits($(this).val());
+  present.altChange(parseInt($('#timeSlider').val(),10));
+  });
+
+  $('#climbunits').change(function() {
+  preference.setClimbUnits($(this).val());
+  });
+
+  $('#lengthunits').change(function() {
+  preference.setLengthUnits($(this).val());
+  present.lengthChange();
+  });
+
+  $('#cruiseunits').change(function() {
+  preference.setCruiseUnits($(this).val());
+  });
+
+  $('#taskunits').change(function() {
+  preference.setTaskUnits($(this).val());
+  });
+
+  $('#unitconfig').click(function() {
+  $('#setunits').show();
+  });
+
+  $('.closewindow').click(function () {
+  $(this).parent().hide();
+  });
+
+  $('#enterTask').click(function(){
+  present.getUserTask();
+  });
+
+  $('input[type=radio][name=tasksource]').change(function () {
+  preference.setTaskSource(this.id);
+  present.replaceTask(this.id);
+  });
+
+  $('#sectorconfig').click(function () {
+  $('#sectordefs').show();
+  });
+
+  $('#setsectors').click(function () {
+  present.setSectors();
+  });
+
+  $('#cancelsectors').click(function () {
+  $(this).parent().hide();
+  });
+
+  $('#tpdefaults').click(function(){
+  preference.setSectorDefaults();
+  present.showSectorPreferences();
+  });
+
+  $('#altref').click(function () {
+  $('#setaltref').show();
+  });
+
+  $('#althelp').click(function () {
+  window.open("igchelp.html#alt", "_blank");
+  });
+
+  $('#restorealtref').click(function () {
+  $(this).parent().hide();
+  });
+
+  $('#applyaltref').click(function () {
+  preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(),$("input[name='altsource']").filter(':checked').val());
+  present.altChange(parseInt($('#timeSlider').val(),10));
+  $(this).parent().hide();
+  });
+  });
+})();
