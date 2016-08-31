@@ -39,6 +39,8 @@ into distinct modules for easier maintenance.
 
 ## Prerequisites
 
+### Install Node.js and Webpack
+
 First install [Node.js](https://nodejs.org), which is a JavaScript interpreter
 that runs outside the browser. This is needed in order to run Webpack.
 
@@ -54,14 +56,26 @@ npm install -g webpack
 ```
 (On Linux systems, this command must be executed with root privileges.)
 
+### Set up API keys
+
+Create a file `src/apikeys.js` of the form:
+
+```javascript
+module.exports = {
+    googleMaps: "put your Google Maps API key here"
+};
+```
+
+This file is excluded from source control to ensure that your key remains secret.
+
 ## Build process
 
 Open a command prompt in the directory where you cloned the
 Git repository and type:
 ```
-npm install jquery
+npm install
 ```
-This will install the jquery library. 
+This will install the required libraries (i.e. jQuery). 
 
 You can then build IGCWebView for debugging simply by typing:
 ```
