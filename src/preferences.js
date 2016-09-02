@@ -1,5 +1,4 @@
-
-(function () {
+(function() {
     //Most of this is still to be written
     //It sets up user display preferences and also handles unit conversion since
     //all internal records and calculations are in metres
@@ -12,6 +11,18 @@
         altref: 'QFE'
     };
 
+    var enlPrefs = {
+        detect: 'Off',
+        threshold: 500,
+        duration: 12
+    };
+
+    var enlDefaults = {
+        detect: 'Off',
+        threshold: 500,
+        duration: 12
+    };
+
     var tasksource = 'igc';
 
     var units = {
@@ -21,6 +32,25 @@
         task: 'kph',
         distance: 'km'
     };
+
+    function enlRealityCheck(enl) {
+        var configerror = "";
+        if (enl.detect === 'On') {
+            if ((enl.threshold < 1) || (enl.threshold > 999)) {
+                configerror += "\nIllegal threshold value";
+            }
+            if ((enl.duration < 2) || (enl.duration > 100)) {
+                configerror += "\nUnrealistic time value";
+            }
+        }
+        if (configerror.length > 0) {
+            alert(configerror);
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 
     function sectorsRealityCheck(newVals) {
         var configerror = "";
@@ -43,7 +73,8 @@
         if (configerror.length > 0) {
             alert(configerror);
             return false;
-        } else {
+        }
+        else {
             return true;
         }
     }
@@ -52,7 +83,8 @@
         if (window.localStorage) {
             try {
                 localStorage.setItem(name, value);
-            } catch (e) {
+            }
+            catch (e) {
                 console.log("error");
                 // If permission is denied, ignore the error.
             }
@@ -80,11 +112,23 @@
             use_barrel: true,
             finishtype: "line"
         },
+        sectorDefaults: {
+            startrad: 5, //start line radius
+            finrad: 1, //finish line radius
+            tprad: 0.5, //'beer can' radius
+            sector_rad: 20, //tp sector radius
+            sector_angle: 90, //tp sector
+            use_sector: true,
+            use_barrel: true,
+            finishtype: "line"
+        },
         units: units,
+        enlPrefs: enlPrefs,
+        enlDefaults: enlDefaults,
         altPrefs: altPrefs,
         metre2foot: METRE2FOOT,
 
-        setSectorDefaults: function () {
+        setSectorDefaults: function() {
             sectors.startrad = 5;
             sectors.finrad = 1;
             sectors.tprad = 0.5;
@@ -95,7 +139,7 @@
             sectors.finishtype = "line";
         },
 
-        setSectors: function (newsectors, savevals) {
+        setSectors: function(newsectors, savevals) {
             if (sectorsRealityCheck(newsectors)) {
                 this.sectors = newsectors;
                 if (savevals) {
@@ -108,7 +152,20 @@
             }
         },
 
-        getStoredValues: function () {
+        setEnl: function(newenl, savevals) {
+            if (enlRealityCheck(newenl)) {
+                this.enlPrefs = newenl;
+                if (savevals) {
+                    storePreference('enlprefs', JSON.stringify(newenl));
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
+        },
+
+        getStoredValues: function() {
             try {
                 var storedAltitudeUnit = localStorage.getItem("altitudeUnit");
                 if (storedAltitudeUnit) {
@@ -139,17 +196,22 @@
                 if (storedSectors) {
                     this.sectors = JSON.parse(storedSectors);
                 }
+                var storedEnlPrefs = localStorage.getItem("enlprefs");
+                if (storedEnlPrefs) {
+                    this.enlPrefs = JSON.parse(storedEnlPrefs);
+                }
                 var storedAltPrefs = localStorage.getItem("altPrefs");
                 if (storedAltPrefs) {
                     this.altPrefs = JSON.parse(storedAltPrefs);
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 // If permission is denied, ignore the error.
                 console.log("error");
             }
         },
 
-        showDistance: function (distance) {
+        showDistance: function(distance) {
             var retvalue;
             if (units.distance === 'km') {
                 retvalue = distance.toFixed(1) + " Km";
@@ -161,11 +223,11 @@
             return retvalue;
         },
 
-        showAltitude: function (pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
+        showAltitude: function(pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
             var takeoff;
             var source;
             var multiplier;
-            if (this.altPrefs.source === 'P') {
+            if (this.altPrefs.altsource === 'P') {
                 showalt = pressureAlt;
                 takeoff = toPressure;
                 source = " (baro) ";
@@ -198,41 +260,41 @@
             };
         },
 
-        setAirclip: function (value) {
+        setAirclip: function(value) {
             this.airclip = value;
             storePreference("airspaceClip", value);
         },
 
-        setAltUnits: function (value) {
+        setAltUnits: function(value) {
             units.altitude = value;
             storePreference("altitudeUnit", value);
         },
 
-        setLengthUnits: function (value) {
+        setLengthUnits: function(value) {
             units.distance = value;
             storePreference("lengthUnit", value);
         },
 
-        setClimbUnits: function (value) {
+        setClimbUnits: function(value) {
             units.climb = value;
             storePreference("climbUnit", value);
         },
 
-        setCruiseUnits: function (value) {
+        setCruiseUnits: function(value) {
             units.cruise = value;
             storePreference("cruiseUnit", value);
         },
 
-        setTaskUnits: function (value) {
+        setTaskUnits: function(value) {
             units.task = value;
             storePreference("taskUnit", value);
         },
 
-        setTaskSource: function (value) {
+        setTaskSource: function(value) {
             this.tasksource = value;
         },
 
-        setAltPrefs: function (altRef, altSource) {
+        setAltPrefs: function(altRef, altSource) {
             this.altPrefs.altref = altRef;
             this.altPrefs.altsource = altSource;
             storePreference("altPrefs", JSON.stringify(this.altPrefs));

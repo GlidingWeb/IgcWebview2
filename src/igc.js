@@ -1,4 +1,4 @@
-(function () {
+(function() {
     //This module parses the IGC file
     //It also contains some calculated data that is directly a function of the file content
 
@@ -25,6 +25,12 @@
         gps: null
     };
     var baseElevation;
+    var engineRunList = [];
+    var glidingRuns = {
+        start: [],
+        end: []
+    };
+
 
     function clearFlight() {
         headers.length = 0;
@@ -51,7 +57,7 @@
 
     module.exports = {
 
-        initialise: function (infile) {
+        initialise: function(infile) {
 
             function getTaskPoints(declaration) {
                 if (declaration.length > 4) {
@@ -61,7 +67,7 @@
                         names: []
                     };
                     for (i = 1; i < declaration.length - 1; i++) {
-                        if ((declaration[i].substring(1, 8) + declaration[i].substring(9, 17)) !== '000000000000000') {   //Allow for loggers with empty C records (eg. EW)
+                        if ((declaration[i].substring(1, 8) + declaration[i].substring(9, 17)) !== '000000000000000') { //Allow for loggers with empty C records (eg. EW)
                             taskpoints.coords.push(utils.parseLatLong(declaration[i].substring(1, 18)));
                             taskpoints.names.push(declaration[i].substring(18));
                         }
@@ -70,11 +76,11 @@
             }
 
             function parsePosition(positionInfo, startTime) {
-                var positionTime = utils.getUnixTime(positionInfo[1]);   //Simple conversion from hhmmss. Return seconds offset from UTC midnight- all we need.
-                if (positionTime < startTime) {    //allow for flight straddling UTC midnight
+                var positionTime = utils.getUnixTime(positionInfo[1]); //Simple conversion from hhmmss. Return seconds offset from UTC midnight- all we need.
+                if (positionTime < startTime) { //allow for flight straddling UTC midnight
                     positionTime += 86400;
                 }
-                var position = utils.parseLatLong(positionInfo[2]);       //conversion to latLong format done in utilites module, as the same code is used elsewhere
+                var position = utils.parseLatLong(positionInfo[2]); //conversion to latLong format done in utilites module, as the same code is used elsewhere
                 if ((position.lat !== 0) && (position.lng !== 0)) {
                     return {
                         recordTime: positionTime,
@@ -133,44 +139,44 @@
             }
 
             function parseManufacturer(aRecord) {
-                var manufacturers = {
-                    'ACT': 'Aircotec',
-                    'CAM': 'Cambridge Aero Instruments',
-                    'CNI': 'Clearnav Instruments',
-                    'DSX': 'Data Swan',
-                    'EWA': 'EW Avionics',
-                    'FIL': 'Filser',
-                    'FLA': 'FLARM',
-                    'FLY': 'Flytech',
-                    'GCS': 'Garrecht',
-                    'IMI': 'IMI Gliding Equipment',
-                    'LGS': 'Logstream',
-                    'LXN': 'LX Navigation',
-                    'LXV': 'LXNAV d.o.o.',
-                    'NAV': 'Naviter',
-                    'NKL': 'Nielsen Kellerman',
-                    'NTE': 'New Technologies s.r.l.',
-                    'PES': 'Peschges',
-                    'PFE': 'PressFinish Technologies',
-                    'PRT': 'Print Technik',
-                    'SCH': 'Scheffel',
-                    'SDI': 'Streamline Data Instruments',
-                    'TRI': 'Triadis Engineering GmbH',
-                    'WES': 'Westerboer',
-                    'XCS': 'XCSoar',
-                    'ZAN': 'Zander'
-                };
-                var manufacturerInfo = {
-                    manufacturer: 'Unknown',
-                    serial: aRecord.substring(4, 7)
-                };
-                var manufacturerCode = aRecord.substring(1, 4);
-                if (manufacturers[manufacturerCode]) {
-                    manufacturerInfo.manufacturer = manufacturers[manufacturerCode];
+                    var manufacturers = {
+                        'ACT': 'Aircotec',
+                        'CAM': 'Cambridge Aero Instruments',
+                        'CNI': 'Clearnav Instruments',
+                        'DSX': 'Data Swan',
+                        'EWA': 'EW Avionics',
+                        'FIL': 'Filser',
+                        'FLA': 'FLARM',
+                        'FLY': 'Flytech',
+                        'GCS': 'Garrecht',
+                        'IMI': 'IMI Gliding Equipment',
+                        'LGS': 'Logstream',
+                        'LXN': 'LX Navigation',
+                        'LXV': 'LXNAV d.o.o.',
+                        'NAV': 'Naviter',
+                        'NKL': 'Nielsen Kellerman',
+                        'NTE': 'New Technologies s.r.l.',
+                        'PES': 'Peschges',
+                        'PFE': 'PressFinish Technologies',
+                        'PRT': 'Print Technik',
+                        'SCH': 'Scheffel',
+                        'SDI': 'Streamline Data Instruments',
+                        'TRI': 'Triadis Engineering GmbH',
+                        'WES': 'Westerboer',
+                        'XCS': 'XCSoar',
+                        'ZAN': 'Zander'
+                    };
+                    var manufacturerInfo = {
+                        manufacturer: 'Unknown',
+                        serial: aRecord.substring(4, 7)
+                    };
+                    var manufacturerCode = aRecord.substring(1, 4);
+                    if (manufacturers[manufacturerCode]) {
+                        manufacturerInfo.manufacturer = manufacturers[manufacturerCode];
+                    }
+                    return manufacturerInfo;
                 }
-                return manufacturerInfo;
-            }
-            //start actual parse
+                //start actual parse
             var utils = require("./utilities.js");
             var lineIndex;
             var positionData;
@@ -208,11 +214,11 @@
                             headers.push(headerData);
                         }
                         break;
-                    case 'I':  //Fix extensions
+                    case 'I': //Fix extensions
                         readEnl = getReadEnl(currentLine);
                         break;
                     case 'C':
-                        if (taskRegex.test(currentLine)) {       //will parse later
+                        if (taskRegex.test(currentLine)) { //will parse later
                             cRecords.push(currentLine.trim());
                         }
                         break;
@@ -233,14 +239,14 @@
                                 noiseLevel = 0;
                             }
                             enl.push(noiseLevel);
-                            if (positionData.pressureAltitude > 0) {       //determine whether pressure altitude is available
+                            if (positionData.pressureAltitude > 0) { //determine whether pressure altitude is available
                                 hasPressure = true;
                             }
                             if (recordTime.length === 0) {
                                 firstFix = positionData.recordTime;
                             }
-                            if (positionData.latLong.lat > bounds.north) {                            //This will mean that the track bounds are returned with the file.
-                                bounds.north = positionData.latLong.lat;                                //Gives a faster display than using the maps api after plotting the track
+                            if (positionData.latLong.lat > bounds.north) { //This will mean that the track bounds are returned with the file.
+                                bounds.north = positionData.latLong.lat; //Gives a faster display than using the maps api after plotting the track
                             }
                             if (positionData.latLong.lat < bounds.south) {
                                 bounds.south = positionData.latLong.lat;
@@ -263,15 +269,60 @@
                 i++;
             }
             takeOff.gps = gpsAltitude[i];
-            unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]);    //This is the only place we use Javascript Date object, easiest way of getting the day of week
+            unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             getTaskPoints(cRecords);
         },
 
-        setBaseElevation: function (elevation) {
+        setBaseElevation: function(elevation) {
             this.baseElevation = elevation;
         },
 
-        timeZone: timeZone,                                                                 //values here persist, can be interrogated from other modules once this is "required"
+        getEngineRuns: function(enlpref) {
+            var i = 0;
+            var startIndex = null;
+            var timeInterval;
+            var engineRun = [];
+            var landingIndex = recordTime.length - 1;
+            engineRunList.length = 0;
+            glidingRuns.start.length = 0;
+            glidingRuns.end.length = 0;
+            glidingRuns.start.push(0);
+            if (enlpref.detect === 'On') {
+                do {
+                    if (enl[i] > enlpref.threshold) {
+                        engineRun.push(latLong[i]);
+                        if (startIndex === null) {
+                            startIndex = i;
+                        }
+                    }
+                    else {
+                        if (startIndex !== null) {
+                            timeInterval = recordTime[i - 1] - recordTime[startIndex];
+                            if (timeInterval >= enlpref.duration) {
+                                glidingRuns.end.push(startIndex);
+                                glidingRuns.start.push(i);
+                                engineRunList.push(engineRun);
+                            }
+                            engineRun = [];
+                            startIndex = null;
+                        }
+                    }
+                    i++;
+                }
+                while (i < landingIndex); //ignore taxying post landing
+                glidingRuns.end.push(landingIndex);
+                //console.log("Igc File");
+                //console.log(engineRunList);
+                //return engineRunList;
+            }
+        },
+
+        showEngineRuns: function() {
+            console.log("getting");
+            console.log(engineRunList);
+        },
+
+        timeZone: timeZone, //values here persist, can be interrogated from other modules once this is "required"
         unixStart: unixStart,
         headers: headers,
         latLong: latLong,
@@ -283,6 +334,8 @@
         taskpoints: taskpoints,
         bounds: bounds,
         takeOff: takeOff,
-        baseElevation: baseElevation
+        baseElevation: baseElevation,
+        glidingRuns: glidingRuns,
+        engineRunList: engineRunList
     };
 })();

@@ -1,4 +1,4 @@
-(function () {
+(function() {
     //This module handles all presentation tasks that are in simple html- ie: excluding the map and graph
 
     var flight = require('./igc');
@@ -49,7 +49,7 @@
         $('#tasklength').text("Task distance: " + prefs.showDistance(distance));
         $('#task').show();
         mapControl.addTask(points, zoomto);
-        $('#taskbuttons button').on('click', function (event) {
+        $('#taskbuttons button').on('click', function(event) {
             var li = $(this).index();
             mapControl.showTP(task.coords[li]);
         });
@@ -74,7 +74,7 @@
 
     module.exports = {
 
-        setSectors: function () {
+        setSectors: function() {
             var sectors = {
                 startrad: $('#startrad').val(),
                 finrad: $('#finishrad').val(),
@@ -93,23 +93,46 @@
             }
         },
 
-        showImported: function (points) {
+        setEnlPrefs: function() {
+            var enl = {
+                detect: $("input[name=enldetect]:checked").val(),
+                threshold: $('#enlthreshold').val(),
+                duration: $('#enltime').val()
+            };
+            var saveit = $('#saveenl').prop('checked');
+            if (prefs.setEnl(enl, saveit)) {
+                if (flight.recordTime.length > 0) {
+                    flight.getEngineRuns(enl);
+                    mapControl.showEngineRuns(flight.engineRunList);
+                    barogram.plot();
+                }
+            }
+        },
+
+        showImported: function(points) {
             enterTask(points, true);
         },
 
-        showSectorPreferences: function () {
-            $('#startrad').val(prefs.sectors.startrad);
-            $('#finishrad').val(prefs.sectors.finrad);
-            $('#tpbarrelrad').val(prefs.sectors.tprad);
-            $('#tpsectorrad').val(prefs.sectors.sector_rad);
-            $('#subtends').val(prefs.sectors.sector_angle);
-            if (prefs.sectors.use_sector) {
+        showSectorPreferences: function(origin) {
+            var sectorObj;
+            if (origin === 'current') {
+                sectorObj = prefs.sectors;
+            }
+            else {
+                sectorObj = prefs.sectorDefaults;
+            }
+            $('#startrad').val(sectorObj.startrad);
+            $('#finishrad').val(sectorObj.finrad);
+            $('#tpbarrelrad').val(sectorObj.tprad);
+            $('#tpsectorrad').val(sectorObj.sector_rad);
+            $('#subtends').val(sectorObj.sector_angle);
+            if (sectorObj.use_sector) {
                 $('#tpsector').prop('checked', true);
             }
-            if (prefs.sectors.use_barrel) {
+            if (sectorObj.use_barrel) {
                 $('#tpbarrel').prop('checked', true);
             }
-            if (prefs.sectors.finishtype === 'line') {
+            if (sectorObj.finishtype === 'line') {
                 $("input[name=finishtype][value='line']").prop("checked", true);
             }
             else {
@@ -117,18 +140,37 @@
             }
         },
 
-        showPreferences: function () {
+        showEnlPrefs: function(origin) {
+            var enlObj;
+            if (origin === 'current') {
+                enlObj = prefs.enlPrefs;
+            }
+            else {
+                enlObj = prefs.enlDefaults;
+            }
+            if (enlObj.detect === 'On') {
+                $("input[name=enldetect][value='On']").prop("checked", true);
+            }
+            else {
+                $("input[name=enldetect][value='Off']").prop("checked", true);
+            }
+            $('#enlthreshold').val(enlObj.threshold),
+                $('#enltime').val(enlObj.duration)
+        },
+
+        showPreferences: function() {
             $('#altitudeunits').val(prefs.units.altitude);
             $('#lengthunits').val(prefs.units.distance);
             $('#climbunits').val(prefs.units.climb);
             $('#cruiseunits').val(prefs.units.cruise);
             $('#taskunits').val(prefs.units.task);
             $('#airclip').val(prefs.airclip);
-            this.showSectorPreferences();
+            this.showSectorPreferences('current');
+            this.showEnlPrefs('current');
             showAltPreferences();
         },
 
-        getUserTask: function () {
+        getUserTask: function() {
             var input;
             var pointdata;
             var success = true;
@@ -136,14 +178,15 @@
                 coords: [],
                 names: []
             };
-            $("#requestdata :input[type=text]").each(function () {
+            $("#requestdata :input[type=text]").each(function() {
                 input = $(this).val().replace(/ /g, '');
                 if (input.length > 0) {
                     pointdata = utils.getPoint(input);
                     if (pointdata.message === "OK") {
                         taskdata.coords.push(pointdata.coords);
                         taskdata.names.push(pointdata.name);
-                    } else {
+                    }
+                    else {
                         success = false;
                         alert("\"" + $(this).val() + "\"" + " not recognised-" + " ignoring entry");
                     }
@@ -157,7 +200,7 @@
             }
         },
 
-        replaceTask: function (source) {
+        replaceTask: function(source) {
             var taskpoints = null;
             $('#taskentry').hide();
             $('#task').hide();
@@ -188,7 +231,7 @@
             }
         },
 
-        showPosition: function (index) {
+        showPosition: function(index) {
             var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
             var displaySentence = utils.unixToString((flight.recordTime[index] + flight.timeZone.offset + 86400) % 86400) + ' ' + flight.timeZone.zoneAbbr + ': ';
             displaySentence += altInfo.displaySentence;
@@ -203,34 +246,34 @@
             });
         },
 
-        altChange: function (index) {
+        altChange: function(index) {
             if (flight.latLong.length > 0) {
                 barogram.plot();
                 this.showPosition(index);
             }
         },
 
-        airClipChange: function () {
+        airClipChange: function() {
             mapControl.showAirspace();
         },
 
-        lengthChange: function () {
+        lengthChange: function() {
             var distance = task.getTaskLength();
             $('#tasklength').text("Task distance: " + prefs.showDistance(distance));
         },
 
-        displayIgc: function () {
+        displayIgc: function() {
             var task = require('./task.js');
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
             mapControl.setBounds(flight.bounds);
-            $.when(utils.getAirspace(flight.bounds, 20)).done(function (args) {
+            $.when(utils.getAirspace(flight.bounds, 20)).done(function(args) {
                 mapControl.setAirspace(args);
                 mapControl.showAirspace();
             });
             var _this = this;
-            $.when(utils.getTimeZone(flight.unixStart[0], flight.latLong[0]), utils.getElevation(flight.latLong[0])).done(function (tzargs, elargs) {
+            $.when(utils.getTimeZone(flight.unixStart[0], flight.latLong[0]), utils.getElevation(flight.latLong[0])).done(function(tzargs, elargs) {
                 if (tzargs[0].status === 'OK') {
                     flight.timeZone.zoneAbbr = tzargs[0].timeZoneName.match(/[A-Z]/g).join('');
                     flight.timeZone.offset = parseFloat(tzargs[0].rawOffset) + parseFloat(tzargs[0].dstOffset);
@@ -245,6 +288,10 @@
             });
 
             mapControl.addTrack(flight.latLong);
+            if (prefs.enlPrefs.detect === 'On') {
+                flight.getEngineRuns(prefs.enlPrefs);
+                mapControl.showEngineRuns(flight.engineRunList);
+            }
             if (prefs.tasksource === 'igc') {
                 if (flight.taskpoints.names.length > 1) {
                     enterTask(flight.taskpoints, false);
@@ -255,10 +302,9 @@
             }
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
-
         },
 
-        zoomTrack: function () {
+        zoomTrack: function() {
             if (flight) {
                 mapControl.setBounds(flight.bounds);
             }
