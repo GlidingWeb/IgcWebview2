@@ -55,7 +55,6 @@
                     altOffset -= flight.takeOff.pressure;
                 }
                 for (j = 0; j < flight.recordTime.length; j++) {
-                    //barogramData.push([1000 * (flight.recordTime[j] + flight.timeZone.offset), multiplier * (flight.pressureAltitude[j] + altOffset)]);
                     spotAlt = multiplier * (flight.pressureAltitude[j] + altOffset);
                     barogramData.push([1000 * (flight.recordTime[j] + flight.timeZone.offset), spotAlt]);
                     if (spotAlt < altMin) {

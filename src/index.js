@@ -1,7 +1,5 @@
 // This is the entry point for the build.  Contains basic user interaction code.
-
 (function() {
-    //var $ = require('jquery');
     var apiKeys = require('./apikeys');
 
     window.ginit = function() { //Callback after maps api loads.  Must be in global scope
@@ -11,7 +9,6 @@
 
     window.importTask = function(points) {
         var present = require('./presentation');
-        console.log("imported");
         present.showImported(points);
         return "Task Entered";
     };
@@ -162,6 +159,10 @@
 
         $('#restorealtref').click(function() {
             $(this).parent().hide();
+        });
+
+        $('#analyse').click(function() {
+            present.reportFlight();
         });
 
         $('#applyaltref').click(function() {

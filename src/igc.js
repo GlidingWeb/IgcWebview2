@@ -30,6 +30,8 @@
         start: [],
         end: []
     };
+    var takeOffIndex;
+    var landingIndex;
 
 
     function clearFlight() {
@@ -269,6 +271,49 @@
                 i++;
             }
             takeOff.gps = gpsAltitude[i];
+            //--
+            var timeInterval = (recordTime[recordTime.length - 1] - recordTime[0]) / recordTime.length;
+            var i = 1;
+            var j = recordTime.length - 1;
+            var cuSum = 0;
+            if (hasPressure) {
+                i = 1;
+                do {
+                    cuSum = cuSum + pressureAltitude[i] - pressureAltitude[i - 1];
+                    i++;
+                }
+                while ((cuSum < 4) && (i < recordTime.length));
+                cuSum = 0;
+                do {
+                    cuSum = cuSum + pressureAltitude[j - 1] - pressureAltitude[j];
+                    j--;
+                }
+                while ((cuSum < 4) && (j > 1));
+            }
+            else {
+                do {
+                    i++;
+                }
+                while ((fixQuality[i] !== 'A') && (i < recordTime.length));
+                do {
+                    cuSum = cuSum + gpsAltitude[i] - gpsAltitude[i - 1];
+                    i++;
+                }
+                while ((cuSum < 4) && (i < recordTime.length));
+                do {
+                    j--;
+                }
+                while ((fixQuality[j] !== 'A') && (j > 2));
+                cuSum = 0;
+                do {
+                    cuSum = cuSum + gpsAltitude[j - 1] - gpsAltitude[j];
+                    j--;
+                }
+                while ((cuSum < 4) && (j > 1));
+            }
+            takeOffIndex = i - 1;
+            landingIndex = j;
+            //--
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             getTaskPoints(cRecords);
         },
@@ -311,15 +356,20 @@
                 }
                 while (i < landingIndex); //ignore taxying post landing
                 glidingRuns.end.push(landingIndex);
-                //console.log("Igc File");
-                //console.log(engineRunList);
-                //return engineRunList;
             }
         },
 
         showEngineRuns: function() {
             console.log("getting");
             console.log(engineRunList);
+        },
+
+        getTakeOffIndex: function() {
+            return takeOffIndex;
+        },
+
+        getLandingIndex: function() {
+            return landingIndex;
         },
 
         timeZone: timeZone, //values here persist, can be interrogated from other modules once this is "required"

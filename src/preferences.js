@@ -1,6 +1,5 @@
 (function() {
-    //Most of this is still to be written
-    //It sets up user display preferences and also handles unit conversion since
+    //This module sets up user display preferences and also handles unit conversion since
     //all internal records and calculations are in metres
 
     var METRE2FOOT = 3.2808399;
@@ -223,26 +222,39 @@
             return retvalue;
         },
 
+        showTaskSpeed: function(speed) { //takes speed in km/hr, converts if needed 
+            var descriptor;
+            if (units.task === 'mph') {
+                speed *= KM2MILES;
+                descriptor = " miles/hr";
+            }
+            else {
+                descriptor = " km/hr";
+            }
+            return speed.toFixed(2) + descriptor;
+        },
+
         showAltitude: function(pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
             var takeoff;
             var source;
             var multiplier;
+            var metreval;
             if (this.altPrefs.altsource === 'P') {
-                showalt = pressureAlt;
+                metreval = pressureAlt;
                 takeoff = toPressure;
                 source = " (baro) ";
             }
             else {
-                showalt = gpsAlt;
+                metreval = gpsAlt;
                 takeoff = toGps;
                 source = " (GPS) ";
             }
             switch (this.altPrefs.altref) {
                 case 'QFE':
-                    showalt -= takeoff;
+                    metreval -= takeoff;
                     break;
                 case 'QNH':
-                    showalt = showalt - takeoff + afElevation;
+                    metreval = metreval - takeoff + afElevation;
                     break;
             }
             if (units.altitude === 'ft') {
@@ -253,10 +265,11 @@
                 descriptor = " metres ";
                 multiplier = 1;
             }
-            showalt = Math.round(showalt * multiplier);
+            showalt = Math.round(metreval * multiplier);
             return {
                 displaySentence: this.altPrefs.altref + source + showalt + descriptor,
-                altPos: showalt
+                altPos: showalt,
+                descriptor: descriptor
             };
         },
 

@@ -55,6 +55,10 @@
         });
     }
 
+    function showLocalTime(index) {
+        return utils.unixToString((flight.recordTime[index] + flight.timeZone.offset + 86400) % 86400);
+    }
+
     function displayHeaders(headerList) {
         var headerBlock = $('#headers');
         var headerIndex;
@@ -233,7 +237,7 @@
 
         showPosition: function(index) {
             var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
-            var displaySentence = utils.unixToString((flight.recordTime[index] + flight.timeZone.offset + 86400) % 86400) + ' ' + flight.timeZone.zoneAbbr + ': ';
+            var displaySentence = showLocalTime(index) + ' ' + flight.timeZone.zoneAbbr + ': ';
             displaySentence += altInfo.displaySentence;
             displaySentence += ": " + utils.showFormat(flight.latLong[index]);
             $('#timePositionDisplay').html(displaySentence);
@@ -263,7 +267,6 @@
         },
 
         displayIgc: function() {
-            var task = require('./task.js');
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
@@ -308,6 +311,60 @@
             if (flight) {
                 mapControl.setBounds(flight.bounds);
             }
+        },
+
+        reportFlight: function() {
+            $('#sectordefs').hide();
+            $('taskcalcs').text('');
+            $('#taskdata').show();
+            var takeOffIndex = flight.getTakeOffIndex();
+            var landingIndex = flight.getLandingIndex();
+            var altValue = [];
+            var altLoss;
+            $('#taskcalcs').html("Take off:  " + showLocalTime(takeOffIndex) + "<br>");
+            if (task.coords.length > 1) {
+                var analyse = require('./analyse');
+                var taskData = analyse.assessTask();
+                for (i = 0; i < task.coords.length; i++) {
+                    $('#taskcalcs').append("<br/>" + task.labels[i] + ": ");
+                    if (i < taskData.npoints) {
+                        $('#taskcalcs').append(showLocalTime(taskData.turnIndices[i]) + ": Altitude: ");
+                        altValue[i] = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[i]], flight.gpsAltitude[taskData.turnIndices[i]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+                        $('#taskcalcs').append(altValue[i].altPos + altValue[i].descriptor);
+                    }
+                    else {
+                        $('#taskcalcs').append("No control");
+                    }
+                }
+                if (taskData.npoints === task.coords.length) { //task completed
+                    $('#taskcalcs').append("<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed");
+                    var elapsedTime = flight.recordTime[taskData.turnIndices[taskData.npoints - 1]] - flight.recordTime[taskData.turnIndices[0]];
+                    $('#taskcalcs').append("<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime));
+                    $('#taskcalcs').append("<br/>Speed: " + prefs.showTaskSpeed(3600 * task.getTaskLength() / elapsedTime));
+                    altLoss = altValue[0].altPos - altValue[task.coords.length - 1].altPos;
+                    $('#taskcalcs').append("<br/>Height loss: " + altLoss + " " + altValue[0].descriptor);
+                    if (prefs.units.altitude !== 'mt') {
+                        if (prefs.altPrefs.source === 'P') {
+                            altLoss = flight.pressureAltitude[taskData.turnIndices[0]] - flight.pressureAltitude[taskData.turnIndices[task.coords.length - 1]];
+                        }
+                        else {
+                            altLoss = flight.gpsAltitude[taskData.turnIndices[0]] - flight.gpsAltitude[taskData.turnIndices[task.coords.length - 1]];
+                        }
+                        $('#taskcalcs').append(" (" + altLoss + "m)");
+                    }
+                }
+                else { // GPS landout
+                    if (taskData.npoints > 0) {
+                        $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
+                        $('#taskcalcs').append("<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]));
+                        $('#taskcalcs').append("<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance));
+                        mapControl.pushPin(flight.latLong[taskData.bestPoint]);
+                    }
+                }
+            }
+            $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
+            var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
+            $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
         }
 
     };

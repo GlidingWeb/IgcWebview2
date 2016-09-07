@@ -150,6 +150,16 @@
                 optimized: false,
                 zIndex: 999
             });
+
+            var pinicon = {
+                url: 'Icons/pin.png',
+                anchor: new google.maps.Point(4, 48)
+            };
+
+            pin = new google.maps.Marker({
+                icon: pinicon,
+                clickable: false
+            });
         },
 
         setBounds: function(bounds) {
@@ -311,6 +321,11 @@
         showTP: function(tpoint) {
             mapObj.panTo(tpoint);
             mapObj.setZoom(13);
+        },
+
+        pushPin: function(coords) {
+            pin.setPosition(coords);
+            pin.setMap(mapObj);
         },
 
         setTimeMarker: function(position) {

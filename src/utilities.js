@@ -2,11 +2,12 @@
 
 var EARTHRAD = 6378; //  Earth radius km
 
-function pad(n) {
-  return (n < 10) ? ("0" + n.toString()) : n.toString();
-}
-
 module.exports = {
+    
+pad: function(n) {
+     return (n < 10) ? ("0" + n.toString()) : n.toString();
+},
+    
   showFormat: function (coords) {
     var latdegrees = Math.abs(coords.lat);
     var latdegreepart = Math.floor(latdegrees);
@@ -105,7 +106,11 @@ module.exports = {
   },
 
   unixToString: function (timestamp) {
-    return pad(Math.floor(timestamp / 3600)) + ":" + pad(Math.floor((timestamp / 60) % 60)) + ":" + pad(timestamp % 60);
+    return this.pad(Math.floor(timestamp / 3600)) + ":" + this.pad(Math.floor((timestamp / 60) % 60)) + ":" + this.pad(timestamp % 60);
+  },
+  
+  unixToPaddedString: function(seconds) {
+       return Math.floor(seconds / 3600) + "hrs "  + this.pad(Math.floor((seconds / 60) % 60)) + "mins " + this.pad(seconds% 60)+ "secs";
   },
 
   toPoint: function (start, end) {
