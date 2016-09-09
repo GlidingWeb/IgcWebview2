@@ -1,6 +1,6 @@
 (function() {
     //This module handles all presentation tasks that are in simple html- ie: excluding the map and graph
-
+    "use strict";
     var flight = require('./igc');
     var prefs = require('./preferences');
     var utils = require('./utilities');
@@ -14,15 +14,6 @@
         $('#task').hide();
         task.clearTask();
         mapControl.zapTask();
-    }
-
-    function showAltPreferences() {
-        if (prefs.altPrefs.altsource === 'P') {
-            $("#P").prop("checked", true);
-        }
-        else {
-            $('#G').prop('checked', true);
-        }
     }
 
     function enterTask(points, zoomto) {
@@ -171,7 +162,7 @@
             $('#airclip').val(prefs.airclip);
             this.showSectorPreferences('current');
             this.showEnlPrefs('current');
-            showAltPreferences();
+            this.showAltPreferences();
         },
 
         getUserTask: function() {
@@ -266,6 +257,29 @@
             $('#tasklength').text("Task distance: " + prefs.showDistance(distance));
         },
 
+        getGeoInfo: function(elevation) {
+            if (elevation === null) {
+                var message = "Start elevation not available.";
+                $('#QNH').attr('disabled', true);
+                $('#QFE').attr('disabled', false);
+                if (prefs.altPrefs.altref === 'QNH') {
+                    message += " Using QFE";
+                    prefs.altPrefs.altref = 'QFE';
+                    $('#QFE').prop('checked', true);
+                }
+                alert(message);
+            }
+            else {
+                $('#QNH').attr('disabled', false);
+                flight.baseElevation=elevation;
+            }
+            barogram.plot();
+            $('#datecell').text(utils.showDate(flight.unixStart[0] + flight.timeZone.offset));
+            console.log(flight.baseElevation);
+            console.log(flight.timeZone.zoneAbbr);
+            this.showPosition(0);
+        },
+
         displayIgc: function() {
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
@@ -275,21 +289,8 @@
                 mapControl.setAirspace(args);
                 mapControl.showAirspace();
             });
-            var _this = this;
-            $.when(utils.getTimeZone(flight.unixStart[0], flight.latLong[0]), utils.getElevation(flight.latLong[0])).done(function(tzargs, elargs) {
-                if (tzargs[0].status === 'OK') {
-                    flight.timeZone.zoneAbbr = tzargs[0].timeZoneName.match(/[A-Z]/g).join('');
-                    flight.timeZone.offset = parseFloat(tzargs[0].rawOffset) + parseFloat(tzargs[0].dstOffset);
-                    flight.timeZone.zoneName = tzargs[0].timeZoneName;
-                    $('#datecell').text(utils.showDate(flight.unixStart[0] + flight.timeZone.offset));
-                }
-                if (elargs[0].status === 'OK') {
-                    flight.setBaseElevation(elargs[0].results[0].elevation);
-                }
-                barogram.plot();
-                _this.showPosition(0);
-            });
-
+            var tzBack = this.getGeoInfo.bind(this);
+            utils.getLocalInfo(flight.unixStart[0], flight.latLong[0], flight.timeZone, tzBack);
             mapControl.addTrack(flight.latLong);
             if (prefs.enlPrefs.detect === 'On') {
                 flight.getEngineRuns(prefs.enlPrefs);
@@ -313,6 +314,13 @@
             }
         },
 
+        showAltPreferences: function() {
+            var altSource = prefs.altPrefs.altsource;
+            $('#' + altSource).prop('checked', true);
+            var altRef = prefs.altPrefs.altref;
+            $('#' + altRef).prop('checked', true);
+        },
+
         reportFlight: function() {
             $('#sectordefs').hide();
             $('taskcalcs').text('');
@@ -325,6 +333,7 @@
             if (task.coords.length > 1) {
                 var analyse = require('./analyse');
                 var taskData = analyse.assessTask();
+                var i;
                 for (i = 0; i < task.coords.length; i++) {
                     $('#taskcalcs').append("<br/>" + task.labels[i] + ": ");
                     if (i < taskData.npoints) {

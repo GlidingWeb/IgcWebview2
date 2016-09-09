@@ -205,7 +205,8 @@
                 name: 'Logger serial number',
                 value: manufacturerInfo.serial
             });
-            var dateRecord = igcLines[1].substring(5);
+            var extractDate = infile.match(/H[FO]DTE([\d]{6})/);
+            var dateRecord = extractDate[1]
             for (lineIndex = 2; lineIndex < igcLines.length; lineIndex++) {
                 currentLine = igcLines[lineIndex];
                 recordType = currentLine.charAt(0);
@@ -271,7 +272,7 @@
                 i++;
             }
             takeOff.gps = gpsAltitude[i];
-            //--
+
             var timeInterval = (recordTime[recordTime.length - 1] - recordTime[0]) / recordTime.length;
             var i = 1;
             var j = recordTime.length - 1;
@@ -313,7 +314,7 @@
             }
             takeOffIndex = i - 1;
             landingIndex = j;
-            //--
+
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             getTaskPoints(cRecords);
         },

@@ -146,6 +146,7 @@
         });
 
         $('#cancelenl').click(function() {
+            present.showEnlPrefs();
             $(this).parent().hide();
         });
 
@@ -159,6 +160,7 @@
 
         $('#restorealtref').click(function() {
             $(this).parent().hide();
+            present.showAltPreferences();
         });
 
         $('#analyse').click(function() {
