@@ -80,6 +80,7 @@
             fillColor: 'green',
             fillOpacity: 0.1,
             center: centre,
+            clickable: false,
             radius: radius * 1000
         });
         return tpCircle;
@@ -114,7 +115,8 @@
             strokeOpacity: 0.8,
             strokeWeight: 1,
             fillColor: 'green',
-            fillOpacity: 0.1
+            fillOpacity: 0.1,
+            clickable: false
         });
         return sectorPoly;
     }
@@ -180,6 +182,7 @@
             trackline.setMap(mapObj);
             gliderMarker.setPosition(track[0]);
             gliderMarker.setMap(mapObj);
+            pin.setMap(null);
         },
 
         showAirspace: function() {

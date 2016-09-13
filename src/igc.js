@@ -10,6 +10,8 @@
     var recordTime = [];
     var fixQuality = [];
     var enl = [];
+    var turnRate = [];
+    var groundSpeed = [];
     var taskpoints = {
         names: [],
         coords: []
@@ -32,6 +34,48 @@
     };
     var takeOffIndex;
     var landingIndex;
+    var hasPressure;
+    var recordInterval;
+
+    function secondPass() {
+        var utils = require('./utilities');
+        var interval = Math.ceil(30 / recordInterval); //getting 30 second average turn rate
+        var j;
+        var i = j - interval;
+        var alt;
+        var snapTurn;
+        var turnList = []; //rolling list of last 30 seconds worth of turn changes
+        var cuSum = 0;
+        var prevBearing = utils.toPoint(latLong[0], latLong[1]).bearing;
+        var nextBearing;
+        var deltaBearing;
+        var speedToHere
+        var travelled;
+        turnRate.push(0);
+        groundSpeed.push(0);
+
+        for (j = 1; j < recordTime.length - 1; j++) {
+            nextBearing = utils.toPoint(latLong[j], latLong[j + 1]).bearing;
+            deltaBearing = Math.round((360 + nextBearing - prevBearing) % 360);
+            if (Math.abs(deltaBearing) > 180) {
+                deltaBearing -= 360;
+            }
+            prevBearing = nextBearing;
+            cuSum += deltaBearing;
+            turnList.push(deltaBearing);
+            if (turnList.length > interval) {
+                cuSum -= turnList.shift();
+                turnRate.push(cuSum / (recordTime[j] - recordTime[j - interval]));
+                travelled = utils.toPoint(latLong[j - interval], latLong[j]).distance;
+                speedToHere = 3600 * travelled / (recordTime[j] - recordTime[j - interval]); //ground speed kph
+                groundSpeed.push(speedToHere);
+            }
+            else {
+                turnRate.push(0);
+                groundSpeed.push(0);
+            }
+        }
+    }
 
 
     function clearFlight() {
@@ -45,6 +89,8 @@
         taskpoints.names.length = 0;
         taskpoints.coords.length = 0;
         unixStart.length = 0;
+        turnRate.length = 0;
+        groundSpeed.length = 0;
         bounds.south = 90;
         bounds.west = 180;
         bounds.north = -90;
@@ -190,7 +236,7 @@
             var cRecords = [];
             var firstFix = 0;
             var taskMatch;
-            var hasPressure = false;
+            hasPressure = false;
             var positionRegex = /^B([\d]{6})([\d]{7}[NS][\d]{8}[EW])([AV])([-\d][\d]{4})([-\d][\d]{4})/;
             var taskRegex = /^C([\d]{7})[NS]([\d]{8})[EW].*/;
             clearFlight();
@@ -273,7 +319,7 @@
             }
             takeOff.gps = gpsAltitude[i];
 
-            var timeInterval = (recordTime[recordTime.length - 1] - recordTime[0]) / recordTime.length;
+            recordInterval = Math.round((recordTime[recordTime.length - 1] - recordTime[0]) / recordTime.length);
             var i = 1;
             var j = recordTime.length - 1;
             var cuSum = 0;
@@ -317,6 +363,8 @@
 
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             getTaskPoints(cRecords);
+            secondPass();
+            console.log(takeOffIndex);
         },
 
         setBaseElevation: function(elevation) {
@@ -373,6 +421,22 @@
             return landingIndex;
         },
 
+        getClimb: function(index) {
+            var recordCount = Math.round(30 / recordInterval);
+            if ((index < (takeOffIndex + recordCount)) || (recordInterval > 4) || (index > landingIndex)) {
+                return null;
+            }
+            else {
+                if (hasPressure) {
+                    return (pressureAltitude[index] - pressureAltitude[index - recordCount]) / (recordTime[index] - recordTime[index - recordCount]);
+                }
+                else {
+                    return (gpsAltitude[index] - gpsAltitude[index - recordCount]) / (recordTime[index] - recordTime[index - recordCount]);
+                }
+            }
+        },
+
+
         timeZone: timeZone, //values here persist, can be interrogated from other modules once this is "required"
         unixStart: unixStart,
         headers: headers,
@@ -387,6 +451,8 @@
         takeOff: takeOff,
         baseElevation: baseElevation,
         glidingRuns: glidingRuns,
-        engineRunList: engineRunList
+        engineRunList: engineRunList,
+        turnRate: turnRate,
+        groundSpeed: groundSpeed
     };
 })();

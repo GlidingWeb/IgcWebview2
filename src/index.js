@@ -21,6 +21,7 @@
     $(document).ready(function() {
         var preference = require('./preferences');
         var present = require('./presentation');
+        var igcFile = require('./igc');
         preference.getStoredValues();
         present.showPreferences();
 
@@ -31,8 +32,7 @@
             if (this.files.length > 0) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    //  try {                                                                //exception handling temporarily disabled till debugged
-                    var igcFile = require('./igc');
+                    //  try {                                                                //exception handling temporarily disabled till debugged    
                     igcFile.initialise(this.result);
                     present.displayIgc();
                     /*
@@ -49,6 +49,11 @@
             }
         });
 
+        $('.closewindow').click(function() {
+         $(this).parent().hide();
+         $('#timeSlider').focus();
+    });
+        
         $('#timeSlider').on('input', function() {
             var t = parseInt($(this).val(), 10);
             present.showPosition(t);
@@ -79,6 +84,10 @@
 
         $('#climbunits').change(function() {
             preference.setClimbUnits($(this).val());
+            if(igcFile.recordTime.length > 0) {
+                var t = parseInt($('#timeSlider').val(), 10);
+                present.showPosition(t);
+            }
         });
 
         $('#lengthunits').change(function() {
@@ -96,10 +105,6 @@
 
         $('#unitconfig').click(function() {
             $('#setunits').show();
-        });
-
-        $('.closewindow').click(function() {
-            $(this).parent().hide();
         });
 
         $('#enterTask').click(function() {
@@ -123,10 +128,6 @@
             present.setSectors();
         });
 
-        $('#cancelsectors').click(function() {
-            $(this).parent().hide();
-        });
-
         $('#tpdefaults').click(function() {
             preference.setSectorDefaults();
             present.showSectorPreferences();
@@ -142,12 +143,10 @@
 
         $('#applyenl').click(function() {
             present.setEnlPrefs();
-            $(this).parent().hide();
         });
 
         $('#cancelenl').click(function() {
             present.showEnlPrefs();
-            $(this).parent().hide();
         });
 
         $('#altref').click(function() {
@@ -159,18 +158,23 @@
         });
 
         $('#restorealtref').click(function() {
-            $(this).parent().hide();
             present.showAltPreferences();
         });
 
         $('#analyse').click(function() {
             present.reportFlight();
         });
-
+ 
+        $('#moreData').click(function () {
+          $('#positionDetail').show();
+          var t = parseInt($('#timeSlider').val(), 10);
+           present.reportDetail(t);
+          //showPositionDetail(t);
+        });
+        
         $('#applyaltref').click(function() {
             preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(), $("input[name='altsource']").filter(':checked').val());
             present.altChange(parseInt($('#timeSlider').val(), 10));
-            $(this).parent().hide();
         });
     });
 })();

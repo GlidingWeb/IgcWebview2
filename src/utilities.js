@@ -291,6 +291,33 @@ module.exports = {
         semaphore = 2;
         gettimezone(start, coords, zone, recall);
         getBaseElevation(coords, recall);
+    },
+    getElevation: function(coords, recall, index) {
+        var elevation;
+        $.ajax({
+                url: "getelevation.php",
+                data: {
+                    lat: coords.lat,
+                    lon: coords.lng
+                },
+                timeout: 3000,
+                method: "POST",
+                dataType: "json"
+            })
+            .done(function(data) {
+                if (data.status === 'OK') {
+                    elevation = data.results[0].elevation;
+                }
+                else {
+                    elevation = null;
+                }
+            })
+            .fail(function() {
+                elevation = null;
+            })
+            .always(function() {
+                recall(elevation, index);
+            });
     }
 
 };

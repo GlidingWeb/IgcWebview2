@@ -227,10 +227,17 @@
         },
 
         showPosition: function(index) {
+            var climbRate = flight.getClimb(index);
             var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
             var displaySentence = showLocalTime(index) + ' ' + flight.timeZone.zoneAbbr + ': ';
             displaySentence += altInfo.displaySentence;
             displaySentence += ": " + utils.showFormat(flight.latLong[index]);
+            if (climbRate !== null) {
+                displaySentence += "; vario: " + prefs.showClimb(climbRate);
+            }
+            if (Math.abs(flight.turnRate[index]) < 2) {
+                displaySentence += " Ground speed: " + prefs.showCruise(flight.groundSpeed[index]);
+            }
             $('#timePositionDisplay').html(displaySentence);
             var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
             var yval = altInfo.altPos;
@@ -271,16 +278,28 @@
             }
             else {
                 $('#QNH').attr('disabled', false);
-                flight.baseElevation=elevation;
+                flight.baseElevation = elevation;
             }
             barogram.plot();
             $('#datecell').text(utils.showDate(flight.unixStart[0] + flight.timeZone.offset));
-            console.log(flight.baseElevation);
-            console.log(flight.timeZone.zoneAbbr);
             this.showPosition(0);
         },
 
         displayIgc: function() {
+            if (flight.takeOff.pressure === null) {
+                $('#P').attr('disabled', true);
+                $('#G').attr('disabled', false);
+                if (prefs.altPrefs.altsource === 'P') {
+                    alert("Pressure altitude not available. Using GPS");
+                    prefs.altPrefs.altsource = 'G';
+                    $('#G').prop('checked', true);
+                }
+            }
+            else {
+                $('#P').attr('disabled', false);
+            }
+            var tzBack = this.getGeoInfo.bind(this);
+            utils.getLocalInfo(flight.unixStart[0], flight.latLong[0], flight.timeZone, tzBack);
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
@@ -289,8 +308,6 @@
                 mapControl.setAirspace(args);
                 mapControl.showAirspace();
             });
-            var tzBack = this.getGeoInfo.bind(this);
-            utils.getLocalInfo(flight.unixStart[0], flight.latLong[0], flight.timeZone, tzBack);
             mapControl.addTrack(flight.latLong);
             if (prefs.enlPrefs.detect === 'On') {
                 flight.getEngineRuns(prefs.enlPrefs);
@@ -374,7 +391,28 @@
             $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
             var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
             $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
-        }
+        },
 
+        showQfe: function(elevation, index) {
+            var displayValue;
+            if (elevation !== null) {
+                if (flight.takeOff.pressure === null) {
+                    displayValue = flight.gpsAltitude[index] - flight.takeOff.pressure + flight.baseElevation - elevation;
+                }
+                else {
+                    displayValue = flight.pressureAltitude[index] - flight.takeOff.pressure + flight.baseElevation - elevation;
+                }
+                var showdata = prefs.displayAlt(displayValue);
+                $('#heightAGL').text("Height above ground: " + showdata.showval + showdata.descriptor);
+            }
+        },
+
+        reportDetail: function(index) {
+            var elevation;
+            if (flight.baseElevation !== null) {
+                var elBack = this.showQfe.bind(this);
+                utils.getElevation(flight.latLong[index], elBack, index);
+            }
+        }
     };
 })();

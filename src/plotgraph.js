@@ -140,6 +140,7 @@
                     var present = require('./presentation');
                     present.showPosition(item.dataIndex);
                     $('#timeSlider').val(item.dataIndex);
+                    $('#timeSlider').focus();
                 }
             });
         },

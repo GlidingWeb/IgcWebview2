@@ -4,6 +4,9 @@
 
     var METRE2FOOT = 3.2808399;
     var KM2MILES = 0.62137119224;
+    var MPS2KNOT = 1.9426025694;
+    var MPS2FPM = 196.8503937;
+    var KM2NM = 0.53961;
 
     var altPrefs = {
         altsource: 'P',
@@ -210,6 +213,22 @@
             }
         },
 
+        showCruise: function(speed) {
+            var retval;
+            switch (units.cruise) {
+                case 'kph':
+                    retval = Math.round(speed) + " km/hr";
+                    break;
+                case 'kt':
+                    retval = Math.round(KM2NM * speed) + " kt";
+                    break;
+                case 'mph':
+                    retval = Math.round(KM2MILES * speed) + " miles/hr";
+                    break;
+            }
+            return retval;
+        },
+
         showDistance: function(distance) {
             var retvalue;
             if (units.distance === 'km') {
@@ -232,6 +251,43 @@
                 descriptor = " km/hr";
             }
             return speed.toFixed(2) + descriptor;
+        },
+
+        showClimb: function(climbRate) {
+            var retval;
+            switch (units.climb) {
+                case 'kt':
+                    climbRate *= MPS2KNOT;
+                    retval = climbRate.toFixed(1) + " knots";
+                    break;
+                case 'mps':
+                    retval = climbRate.toFixed(1) + ' m/s';
+                    break;
+                case 'fpm':
+                    climbRate *= MPS2FPM;
+                    retval = Math.round(climbRate) + " ft/min";
+            }
+            if (climbRate > 0) {
+                retval = "+" + retval;
+            }
+            return retval;
+        },
+
+        displayAlt: function(metres) {
+            var retval;
+            var descriptor;
+            if (units.altitude == 'ft') {
+                retval = Math.round(METRE2FOOT * metres);
+                descriptor = " feet";
+            }
+            else {
+                retval = Math.round(metres);
+                descriptor = " metres";
+            }
+            return {
+                showval: retval,
+                descriptor: descriptor
+            };
         },
 
         showAltitude: function(pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
@@ -257,19 +313,11 @@
                     metreval = metreval - takeoff + afElevation;
                     break;
             }
-            if (units.altitude === 'ft') {
-                multiplier = METRE2FOOT;
-                descriptor = " feet ";
-            }
-            else {
-                descriptor = " metres ";
-                multiplier = 1;
-            }
-            showalt = Math.round(metreval * multiplier);
+            var showalt = this.displayAlt(metreval);
             return {
-                displaySentence: this.altPrefs.altref + source + showalt + descriptor,
-                altPos: showalt,
-                descriptor: descriptor
+                displaySentence: this.altPrefs.altref + source + showalt.showval + showalt.descriptor,
+                altPos: showalt.showval,
+                descriptor: showalt.descriptor
             };
         },
 
