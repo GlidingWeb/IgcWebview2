@@ -39,7 +39,7 @@
 
     function secondPass() {
         var utils = require('./utilities');
-        var interval = Math.ceil(30 / recordInterval); //getting 30 second average turn rate
+        var interval = Math.ceil(15 / recordInterval); //getting 15 second average turn rate
         var j;
         var i = j - interval;
         var alt;

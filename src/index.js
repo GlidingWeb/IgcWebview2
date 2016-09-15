@@ -50,10 +50,10 @@
         });
 
         $('.closewindow').click(function() {
-         $(this).parent().hide();
-         $('#timeSlider').focus();
-    });
-        
+            $(this).parent().hide();
+            $('#timeSlider').focus();
+        });
+
         $('#timeSlider').on('input', function() {
             var t = parseInt($(this).val(), 10);
             present.showPosition(t);
@@ -84,7 +84,7 @@
 
         $('#climbunits').change(function() {
             preference.setClimbUnits($(this).val());
-            if(igcFile.recordTime.length > 0) {
+            if (igcFile.recordTime.length > 0) {
                 var t = parseInt($('#timeSlider').val(), 10);
                 present.showPosition(t);
             }
@@ -164,14 +164,13 @@
         $('#analyse').click(function() {
             present.reportFlight();
         });
- 
-        $('#moreData').click(function () {
-          $('#positionDetail').show();
-          var t = parseInt($('#timeSlider').val(), 10);
-           present.reportDetail(t);
-          //showPositionDetail(t);
+
+        $('#height').click(function() {
+            $('#heightDetail').show();
+            var t = parseInt($('#timeSlider').val(), 10);
+            present.reportHeightInfo(t);
         });
-        
+
         $('#applyaltref').click(function() {
             preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(), $("input[name='altsource']").filter(':checked').val());
             present.altChange(parseInt($('#timeSlider').val(), 10));

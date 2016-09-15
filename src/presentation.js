@@ -226,6 +226,7 @@
             }
         },
 
+        /*
         showPosition: function(index) {
             var climbRate = flight.getClimb(index);
             var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
@@ -237,6 +238,52 @@
             }
             if (Math.abs(flight.turnRate[index]) < 2) {
                 displaySentence += " Ground speed: " + prefs.showCruise(flight.groundSpeed[index]);
+            }
+            $('#timePositionDisplay').html(displaySentence);
+            var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
+            var yval = altInfo.altPos;
+            mapControl.setTimeMarker(flight.latLong[index]);
+            barogram.lockCrosshair({
+                x: xval,
+                y: yval
+            });
+        },
+*/
+        showPosition: function(index) {
+            var flightMode = "Transition";
+            var climbRate = flight.getClimb(index);
+            var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+            var displaySentence = "<b>Time:</b>&nbsp;" + showLocalTime(index) + "&nbsp;" + flight.timeZone.zoneAbbr + ":";
+            displaySentence += "  <b>Position:</b>&nbsp;" + utils.showFormat(flight.latLong[index]) + ":";
+
+            var takeOffIndex = flight.getTakeOffIndex();
+            var landingIndex = flight.getLandingIndex();
+            if (index < takeOffIndex) {
+                flightMode = "Pre&nbsp;take&nbsp;off";
+            }
+            else {
+                if (index > landingIndex) {
+                    flightMode = "Landed";
+                }
+                else {
+                    var turn = Math.abs(flight.turnRate[index]);
+                    if (turn > 5) {
+                        flightMode = "Circling";
+                    }
+                    if (turn < 4) {
+                        flightMode = "Cruising";
+                    }
+                }
+            }
+            if (flightMode) {
+                displaySentence += " <b>Flight&nbsp;mode:</b>&nbsp;" + flightMode + ":";
+            }
+            displaySentence += " <b>Altitude:</b>&nbsp;" + altInfo.displaySentence + ":";
+            if (climbRate !== null) {
+                displaySentence += " <b>Vario:</b> " + prefs.showClimb(climbRate) + ":";
+            }
+            if (flightMode === "Cruising") {
+                displaySentence += " <b>Ground speed:</b>&nbsp;" + prefs.showCruise(flight.groundSpeed[index]);
             }
             $('#timePositionDisplay').html(displaySentence);
             var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
@@ -407,7 +454,7 @@
             }
         },
 
-        reportDetail: function(index) {
+        reportHeightInfo: function(index) {
             var elevation;
             if (flight.baseElevation !== null) {
                 var elBack = this.showQfe.bind(this);
