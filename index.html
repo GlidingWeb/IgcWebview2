@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="initial-scale=1, width=device-width">
-      <link rel="stylesheet" href="igcviewer2.css" />
+      <link rel="stylesheet" href="igcviewer.css" />
       <title>IGC Viewer</title>
    </head>
    <body>
@@ -133,7 +133,7 @@
                </div>
                <div id='statusbuttons'>
                   <button id="height" class='floatright'>Height AGL</button>
-                  <button  class='floatright'>Thermal detail</button>
+                  <button  class='floatright' id='thermal'>Thermal detail</button>
                </div>
             </div>
             <p><button id="analyse"> Analyse task</button></p>
@@ -240,9 +240,17 @@
          <button id="applyaltref" class="floatright closewindow">Apply</button>
       </div>
       <div id='heightDetail'>
-         <p id="heightAGL"></p>
-         <p id="flightMode"></p>
-         <p id="flightdetail1"></p>
+          <p><b>Glider altitude:</b> <span id='qnh'></span></p>
+         <p><b>Terrain height: </b><span  id="terrain"></span></p>
+         <p><b>Height AGL:</b> <span id='htAgl'></span></p>
+         <button class="floatright closewindow">Close</button>
+      </div>
+     <div id='thermalDetail'>
+          <p><b>Information on this thermal: </b>
+          <p><b>Thermal entry :</b> <span id='thermalEntry'></span></p>
+         <p><b>Thermal exit: </b><span  id="thermalExit"></span></p>
+         <p><b>Net Gain: </b> <span id='thermalGain'></span></p>
+         <p><b>Average climb rate: </b> <span id='thermalClimb'></span></p>
          <button class="floatright closewindow">Close</button>
       </div>
       <script src="bundle.js"></script>

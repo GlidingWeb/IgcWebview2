@@ -157,7 +157,12 @@ module.exports = {
     },
 
     unixToPaddedString: function(seconds) {
-        return Math.floor(seconds / 3600) + "hrs " + this.pad(Math.floor((seconds / 60) % 60)) + "mins " + this.pad(seconds % 60) + "secs";
+        if (seconds < 3600) {
+            return Math.floor(seconds / 60) + "mins " + this.pad(seconds % 60) + "secs";
+        }
+        else {
+            return Math.floor(seconds / 3600) + "hrs " + this.pad(Math.floor((seconds / 60) % 60)) + "mins " + this.pad(seconds % 60) + "secs";
+        }
     },
 
     toPoint: function(start, end) {
@@ -292,7 +297,7 @@ module.exports = {
         gettimezone(start, coords, zone, recall);
         getBaseElevation(coords, recall);
     },
-    getElevation: function(coords, recall, index) {
+    getElevation: function(coords, recall, index, glideralt) {
         var elevation;
         $.ajax({
                 url: "getelevation.php",
@@ -316,7 +321,7 @@ module.exports = {
                 elevation = null;
             })
             .always(function() {
-                recall(elevation, index);
+                recall(elevation, index, glideralt);
             });
     }
 

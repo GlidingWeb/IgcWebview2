@@ -421,6 +421,25 @@
             return landingIndex;
         },
 
+        getThermalInfo: function(index) {
+            var bottomIndex = index;
+            var topIndex = index;
+            do {
+                bottomIndex--;
+            }
+            while ((Math.abs(turnRate[bottomIndex]) > 3) && (bottomIndex > takeOffIndex));
+            do {
+                topIndex++;
+            }
+            while ((Math.abs(turnRate[topIndex]) > 5) && (topIndex < landingIndex));
+            return {
+                entryTime: recordTime[bottomIndex] + timeZone.offset,
+                entryIndex: bottomIndex,
+                exitTime: recordTime[topIndex] + timeZone.offset,
+                exitIndex: topIndex
+            };
+        },
+
         getClimb: function(index) {
             var recordCount = Math.round(30 / recordInterval);
             if ((index < (takeOffIndex + recordCount)) || (recordInterval > 4) || (index > landingIndex)) {

@@ -226,29 +226,6 @@
             }
         },
 
-        /*
-        showPosition: function(index) {
-            var climbRate = flight.getClimb(index);
-            var altInfo = prefs.showAltitude(flight.pressureAltitude[index], flight.gpsAltitude[index], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
-            var displaySentence = showLocalTime(index) + ' ' + flight.timeZone.zoneAbbr + ': ';
-            displaySentence += altInfo.displaySentence;
-            displaySentence += ": " + utils.showFormat(flight.latLong[index]);
-            if (climbRate !== null) {
-                displaySentence += "; vario: " + prefs.showClimb(climbRate);
-            }
-            if (Math.abs(flight.turnRate[index]) < 2) {
-                displaySentence += " Ground speed: " + prefs.showCruise(flight.groundSpeed[index]);
-            }
-            $('#timePositionDisplay').html(displaySentence);
-            var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
-            var yval = altInfo.altPos;
-            mapControl.setTimeMarker(flight.latLong[index]);
-            barogram.lockCrosshair({
-                x: xval,
-                y: yval
-            });
-        },
-*/
         showPosition: function(index) {
             var flightMode = "Transition";
             var climbRate = flight.getClimb(index);
@@ -440,25 +417,55 @@
             $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
         },
 
-        showQfe: function(elevation, index) {
+        showQfe: function(elevation, index, glideralt) {
             var displayValue;
             if (elevation !== null) {
                 if (flight.takeOff.pressure === null) {
-                    displayValue = flight.gpsAltitude[index] - flight.takeOff.pressure + flight.baseElevation - elevation;
+                    displayValue = flight.gpsAltitude[index] - flight.takeOff.gps + flight.baseElevation - elevation;
                 }
                 else {
                     displayValue = flight.pressureAltitude[index] - flight.takeOff.pressure + flight.baseElevation - elevation;
                 }
-                var showdata = prefs.displayAlt(displayValue);
-                $('#heightAGL').text("Height above ground: " + showdata.showval + showdata.descriptor);
+                var showQnh = prefs.displayAlt(displayValue);
+                $('#heightAGL').text("Height above ground: " + showQnh.showval + showQnh.descriptor);
+                var showElev = prefs.displayAlt(elevation);
+                $('#terrain').text(showElev.showval + showElev.descriptor);
+                $('#htAgl').text((glideralt - showElev.showval) + showElev.descriptor);
             }
+        },
+
+        reportThermal: function(index) {
+            var heightGain;
+            var thermalData = flight.getThermalInfo(index);
+            var entryHeight = prefs.showAltitude(flight.pressureAltitude[thermalData.entryIndex], flight.gpsAltitude[thermalData.entryIndex], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+            var exitHeight = prefs.showAltitude(flight.pressureAltitude[thermalData.exitIndex], flight.gpsAltitude[thermalData.exitIndex], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+            $('#thermalEntry').text(utils.unixToString(thermalData.entryTime) + " at " + entryHeight.altPos + entryHeight.descriptor);
+            $('#thermalExit').text(utils.unixToString(thermalData.exitTime) + " at " + exitHeight.altPos + exitHeight.descriptor);
+            $('#thermalGain').text((exitHeight.altPos - entryHeight.altPos) + entryHeight.descriptor + " in " + utils.unixToPaddedString(thermalData.exitTime - thermalData.entryTime));
+            if (flight.takeOff.pressure === null) {
+                heightGain = flight.gpsAltitude[thermalData.exitIndex] - flight.gpsAltitude[thermalData.entryIndex];
+            }
+            else {
+                heightGain = flight.pressureAltitude[thermalData.exitIndex] - flight.pressureAltitude[thermalData.entryIndex];
+            }
+            $('#thermalClimb').text(prefs.showClimb(heightGain / (thermalData.exitTime - thermalData.entryTime)));
         },
 
         reportHeightInfo: function(index) {
             var elevation;
+            var qnhMetric;
+            var qnh;
             if (flight.baseElevation !== null) {
+                if (flight.takeOff.pressure === null) {
+                    qnhMetric = flight.gpsAltitude[index] - flight.takeOff.gps + flight.baseElevation;
+                }
+                else {
+                    qnhMetric = flight.pressureAltitude[index] - flight.takeOff.pressure + flight.baseElevation;
+                }
+                qnh = prefs.displayAlt(qnhMetric);
+                $('#qnh').text(qnh.showval + qnh.descriptor + " asl");
                 var elBack = this.showQfe.bind(this);
-                utils.getElevation(flight.latLong[index], elBack, index);
+                utils.getElevation(flight.latLong[index], elBack, index, qnh.showval);
             }
         }
     };

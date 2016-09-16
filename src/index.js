@@ -171,6 +171,12 @@
             present.reportHeightInfo(t);
         });
 
+        $('#thermal').click(function() {
+            $('#thermalDetail').show();
+            var t = parseInt($('#timeSlider').val(), 10);
+            present.reportThermal(t);
+        });
+
         $('#applyaltref').click(function() {
             preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(), $("input[name='altsource']").filter(':checked').val());
             present.altChange(parseInt($('#timeSlider').val(), 10));
