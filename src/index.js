@@ -171,6 +171,7 @@
         });
 
         $('#analyse').click(function() {
+            hiderest();
             present.reportFlight();
         });
 
