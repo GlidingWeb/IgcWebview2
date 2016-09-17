@@ -18,6 +18,10 @@
     script.src = 'https://maps.googleapis.com/maps/api/js?v=3&key=' + apiKeys.googleMaps + '&callback=ginit';
     document.body.appendChild(script);
 
+    function hiderest() {
+        $('.easyclose').hide();
+    }
+
     $(document).ready(function() {
         var preference = require('./preferences');
         var present = require('./presentation');
@@ -28,38 +32,39 @@
         $("#igc").prop("checked", true); //Firefox ignores markup on refresh
 
         $('#fileControl').change(function() {
-
             if (this.files.length > 0) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    //  try {                                                                //exception handling temporarily disabled till debugged    
-                    igcFile.initialise(this.result);
-                    present.displayIgc();
-                    /*
-                    } catch (ex) {
-                    if (ex instanceof IGCException) {
-                    alert(ex.message);
-                    } else {
-                    throw ex;
+                    try {
+                        igcFile.initialise(this.result);
+                        present.displayIgc();
                     }
+                    catch (ex) {
+                        if (ex instanceof igcFile.IGCException) {
+                            alert(ex.message);
+                        }
+                        else {
+                            throw ex;
+                        }
                     }
-                    */
                 };
                 reader.readAsText(this.files[0]);
             }
         });
 
         $('.closewindow').click(function() {
-            $(this).parent().hide();
+            $('.easyclose').hide();
             $('#timeSlider').focus();
         });
 
         $('#timeSlider').on('input', function() {
+            hiderest();
             var t = parseInt($(this).val(), 10);
             present.showPosition(t);
         });
 
         $('#timeSlider').on('change', function() {
+            hiderest();
             var t = parseInt($(this).val(), 10);
             present.showPosition(t);
         });
@@ -104,6 +109,7 @@
         });
 
         $('#unitconfig').click(function() {
+            hiderest();
             $('#setunits').show();
         });
 
@@ -117,6 +123,7 @@
         });
 
         $('#sectorconfig').click(function() {
+            hiderest();
             $('#sectordefs').show();
         });
 
@@ -134,6 +141,7 @@
         });
 
         $('#enl').click(function() {
+            hiderest();
             $('#setenl').show();
         });
 
@@ -150,6 +158,7 @@
         });
 
         $('#altref').click(function() {
+            hiderest();
             $('#setaltref').show();
         });
 
@@ -166,12 +175,14 @@
         });
 
         $('#height').click(function() {
+            hiderest();
             $('#heightDetail').show();
             var t = parseInt($('#timeSlider').val(), 10);
             present.reportHeightInfo(t);
         });
 
         $('#thermal').click(function() {
+            hiderest();
             $('#thermalDetail').show();
             var t = parseInt($('#timeSlider').val(), 10);
             present.reportThermal(t);

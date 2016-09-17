@@ -33,10 +33,45 @@ h3 {
     text-align: center;
 }
 
+div.halfwidth {
+    display: inline-block;
+    width: calc(50% - 30px);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+#task, #taskentry {
+    display: none;
+    width: 100%;
+}
+
+#taskinfo td {
+    padding: 0px 20px;
+}
+
+#flightInfo {
+    float: right;
+    margin-bottom: 20px;
+    display: none;
+}
+
 #map {
     width: 100%;
     height: 85vh;
     margin-bottom: 15px;
+    visibility: hidden;
+}
+
+#zoomtrack,#zoomlabel {
+display: none;
+}
+
+#righthalf   {
+visibility: hidden;
 }
 
 #barogram {
@@ -60,13 +95,6 @@ h3 {
 #righthalf {
     position: absolute;
     right: 0;
-}
-
-div.halfwidth {
-    display: inline-block;
-    width: calc(50% - 30px);
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 div.container {
@@ -95,13 +123,9 @@ div.container {
     font-weight: bold;
 }
 
-#taskinfo td {
-    padding: 0px 20px;
-}
 
-.nowrap {
-    white-space: nowrap;
-}
+
+
 
 input[name="tasksource"] {
     margin-right: 40px;
@@ -137,33 +161,18 @@ button.toggle {
     margin-bottom: 30px;
 }
 
-#igcFileDisplay {
-    clear: both;
-}
-
 table#headerInfo {
     border-spacing: 0.1em;
 }
 
-#task, #taskentry {
-    display: none;
-    width: 100%;
-}
 
-#airspace_info, #flightinfo {
-    display: none;
-}
 
 #headerInfo th {
     text-align: left;
     font-weight: bold;
 }
 
-#flightInfo {
-    float: right;
-    margin-bottom: 20px;
-    padding-top: 20px;
-}
+
 
 #taskdata {
     display: none;

@@ -14,7 +14,7 @@
          <p>
             A free browser-based tool for viewing IGC format tracks and barograph traces from gliding loggers.
          </p>
-         <p> &copy; 2015 Alistair Malcolm Green and Richard Brisbourne </p>
+         <p> &copy; 2016 Alistair Malcolm Green and Richard Brisbourne </p>
          <p>
             <b>Warning:</b> Airspace data is not valid for flight planning or navigation
          </p>
@@ -46,7 +46,7 @@
                   &nbsp;<button id="enl">Engine</button>
                   &nbsp;<button id="altref">Altitude ref.</button>
                   <span class="nowrap">
-                     <label for="airclip"> &nbsp;Hide airspace over:</label>
+                     <label for="airclip"> &nbsp;Hide  airspace over:</label>
                      <select id="airclip" class="inbutton">
                         <option value="0">No Airspace</option>
                         <option value="3001">3000 feet</option>
@@ -60,7 +60,7 @@
                </p>
             </div>
          </div>
-         <h2 id='test'>Select Task Source</h2>
+         <h2>Select Task Source</h2>
          <button class='toggle'>Hide</button>
          <div>
             <p><span class='nowrap'><label for='igc'>IGC File</label><input type='radio' name='tasksource'  value='igc' id='igc' checked="checked" /></span>
@@ -102,7 +102,6 @@
       <div id="flightInfo" class="halfwidth">
          <h2> Flight Information </h2>
          <button class='toggle'>Hide</button>
-         <div>
             <table id="headerInfo">
                <tbody>
                   <tr>
@@ -112,14 +111,13 @@
                <tbody id="headers">
                </tbody>
             </table>
-         </div>
+        
       </div>
-      <br>
-      <div id="igcFileDisplay">
-         <div id="mapWrapper" class='halfwidth'>
+      <br clear='all'>
+         <div id="mapWrapper" class='halfwidth' >
             <div id="map"></div>
-            <p>Zoom:
-               <button id="zoomtrack">Track</button>&nbsp;&nbsp;<span id="taskbuttons"></span>
+            <p><span id='zoomlabel'>Zoom:</span>
+               <button id="zoomtrack" class='floatright'>Track</button>&nbsp;&nbsp;<span id="taskbuttons"></span>
             </p>
          </div>
          <div id="righthalf" class='halfwidth'>
@@ -138,7 +136,6 @@
             </div>
             <p><button id="analyse"> Analyse task</button></p>
          </div>
-      </div>
       <div id="taskdata">
          <p id="takeoff"></p>
          <p id="startmsg"></p>
@@ -171,7 +168,7 @@
          <button class="closewindow">Cancel</button>
          <button id="setsectors">Apply</button>
       </div>
-      <div id='setunits'>
+      <div id='setunits' class='easyclose'>
          <p><b>Select units:</b> </p>
          <p>
             Altitude: 
@@ -213,7 +210,7 @@
          </p>
          <button class="closewindow floatright">Close</button>
       </div>
-      <div id='setenl'>
+      <div id='setenl' class='easyclose'>
          <p><b>ENL engine detect:</b> <input type="radio" name="enldetect" value="Off" checked>Off&nbsp;  <input type="radio" name="enldetect" value="On">On
          <p>Threshold: <input type='text' id="enlthreshold" value='500'> (1-1000)</p>
          <p>Time required: <input type='text' id="enltime" value='12'> seconds</p>
@@ -223,7 +220,7 @@
          <button id="cancelenl" class="closewindow">Cancel</button>
          <button id="applyenl" class="floatright closewindow">Apply</button>
       </div>
-      <div id='setaltref'>
+      <div id='setaltref'  class='easyclose'>
          <h3>Altitude reference</h3>
          <p>*Standard (STD) <input type='radio' name='alttype'  id='std' value='std'/><br />
             QFE take off <input type='radio'  name='alttype'   id='QFE'  value='QFE'  checked='checked' /><br />
@@ -239,13 +236,13 @@
          <button id="restorealtref" class="closewindow">Cancel</button>
          <button id="applyaltref" class="floatright closewindow">Apply</button>
       </div>
-      <div id='heightDetail'>
+      <div id='heightDetail' class='easyclose'>
           <p><b>Glider altitude:</b> <span id='qnh'></span></p>
          <p><b>Terrain height: </b><span  id="terrain"></span></p>
          <p><b>Height AGL:</b> <span id='htAgl'></span></p>
          <button class="floatright closewindow">Close</button>
       </div>
-     <div id='thermalDetail'>
+     <div id='thermalDetail'  class='easyclose'>
           <p><b>Information on this thermal: </b>
           <p><b>Thermal entry :</b> <span id='thermalEntry'></span></p>
          <p><b>Thermal exit: </b><span  id="thermalExit"></span></p>

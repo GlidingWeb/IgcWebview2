@@ -104,6 +104,11 @@
     }
 
     module.exports = {
+        IGCException: function(message) {
+            'use strict';
+            this.message = message;
+            this.name = "IGCException";
+        },
 
         initialise: function(infile) {
 
@@ -241,7 +246,14 @@
             var taskRegex = /^C([\d]{7})[NS]([\d]{8})[EW].*/;
             clearFlight();
             var igcLines = infile.split("\n");
-            //file validity check to go  here
+            if (igcLines.length < 2) {
+                throw new this.IGCException("Invalid file- corrupt or empty");
+            }
+            // The first line should begin with 'A' followed by
+            // a 3-character manufacturer Id and a 3-character serial number.
+            if (!(/^A[\w]{6}/).test(igcLines[0])) {
+                throw new this.IGCException("Invalid file- missing or faulty A record");
+            }
             var manufacturerInfo = parseManufacturer(igcLines[0]);
             headers.push({
                 name: 'Logger manufacturer',
@@ -251,9 +263,14 @@
                 name: 'Logger serial number',
                 value: manufacturerInfo.serial
             });
-            var extractDate = infile.match(/H[FO]DTE([\d]{6})/);
-            var dateRecord = extractDate[1]
-            for (lineIndex = 2; lineIndex < igcLines.length; lineIndex++) {
+            var extractDate = infile.match(/H[FPO]DTE([\d]{6})/);
+            if (extractDate) {
+                var dateRecord = extractDate[1];
+            }
+            else {
+                throw new this.IGCException("Invalid file- missing date record");
+            }
+            for (lineIndex = 1; lineIndex < igcLines.length; lineIndex++) {
                 currentLine = igcLines[lineIndex];
                 recordType = currentLine.charAt(0);
                 switch (recordType) {
@@ -310,6 +327,9 @@
                         break;
                 }
             }
+            if (recordTime.length < 3) {
+                throw new this.IGCException("File rejected- insufficient records");
+            }
             if (hasPressure) {
                 takeOff.pressure = pressureAltitude[0];
             }
@@ -364,7 +384,6 @@
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             getTaskPoints(cRecords);
             secondPass();
-            console.log(takeOffIndex);
         },
 
         setBaseElevation: function(elevation) {

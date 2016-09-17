@@ -66,7 +66,6 @@
         var bestSoFar = 0;
         var bestIndex;
         tpindices = [];
-        console.log("Section");
         do {
             if (curLeg < 2) { //not reached first TP
                 startstatus = utils.toPoint(task.coords[0], flight.latLong[i]); //check if in start zone
@@ -144,7 +143,6 @@
             var bestLength = 0;
             var i;
             var sectorLimits = getSectorLimits(task, prefs.sectors);
-            console.log("Assessing");
             if ((prefs.enlPrefs.detect === 'Off') || (flight.engineRunList.length === 0)) {
                 assessment = assessSection(flight.getTakeOffIndex(), flight.getLandingIndex(), sectorLimits);
             }

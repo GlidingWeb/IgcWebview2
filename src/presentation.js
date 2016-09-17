@@ -39,7 +39,9 @@
         }
         $('#tasklength').text("Task distance: " + prefs.showDistance(distance));
         $('#task').show();
+        $('#zoomlabel').show();
         mapControl.addTask(points, zoomto);
+        $('#map').css('visibility', 'visible');
         $('#taskbuttons button').on('click', function(event) {
             var li = $(this).index();
             mapControl.showTP(task.coords[li]);
@@ -247,10 +249,19 @@
                     if (turn > 5) {
                         flightMode = "Circling";
                     }
+                    else {
+                        $('#thermal').hide();
+                    }
                     if (turn < 4) {
                         flightMode = "Cruising";
                     }
                 }
+            }
+            if (flightMode === 'Circling') {
+                $('#thermal').show();
+            }
+            else {
+                $('#thermal').hide();
             }
             if (flightMode) {
                 displaySentence += " <b>Flight&nbsp;mode:</b>&nbsp;" + flightMode + ":";
@@ -310,6 +321,7 @@
         },
 
         displayIgc: function() {
+            $('#flightInfo').show();
             if (flight.takeOff.pressure === null) {
                 $('#P').attr('disabled', true);
                 $('#G').attr('disabled', false);
@@ -322,17 +334,20 @@
             else {
                 $('#P').attr('disabled', false);
             }
+            $('#righthalf').css('visibility', 'visible');
             var tzBack = this.getGeoInfo.bind(this);
             utils.getLocalInfo(flight.unixStart[0], flight.latLong[0], flight.timeZone, tzBack);
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
             mapControl.setBounds(flight.bounds);
+            $('#map').css('visibility', 'visible');
             $.when(utils.getAirspace(flight.bounds, 20)).done(function(args) {
                 mapControl.setAirspace(args);
                 mapControl.showAirspace();
             });
             mapControl.addTrack(flight.latLong);
+            $('#zoomtrack').show();
             if (prefs.enlPrefs.detect === 'On') {
                 flight.getEngineRuns(prefs.enlPrefs);
                 mapControl.showEngineRuns(flight.engineRunList);

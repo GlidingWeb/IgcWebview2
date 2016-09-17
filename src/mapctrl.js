@@ -138,8 +138,6 @@
             }];
 
             var mapOpt = {
-                center: new google.maps.LatLng(0, 0),
-                zoom: 2,
                 mapTypeId: google.maps.MapTypeId.TERRAIN,
                 streetViewControl: false,
                 styles: myStyles
@@ -301,6 +299,10 @@
                 strokeOpacity: 1.0,
                 strokeWeight: 3
             });
+            if (zoomto) {
+                var taskbounds = getLineBounds(route);
+                mapObj.fitBounds(taskbounds);
+            }
             route.setMap(mapObj);
             taskfeatures.push(route);
             for (j = 0; j < tplist.names.length - 1; j++) {
@@ -313,10 +315,6 @@
                     zIndex: 50
                 });
                 taskfeatures.push(taskmarker);
-            }
-            if (zoomto) {
-                var taskbounds = getLineBounds(route);
-                mapObj.fitBounds(taskbounds);
             }
             this.addSectors(tplist);
         },
