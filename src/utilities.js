@@ -1,6 +1,5 @@
 //Contains general purpose calculations- not necessarily exclusive to this application
 var EARTHRAD = 6378; //  Earth radius km
-
 var semaphore;
 var startElevation;
 
@@ -297,6 +296,70 @@ module.exports = {
         gettimezone(start, coords, zone, recall);
         getBaseElevation(coords, recall);
     },
+
+    kasaRegress: function(xVectors, yVectors, xMean, yMean) { //Kasa method for circular regression
+        var i;
+        var xi;
+        var yi;
+        var mxx = 0;
+        var myy = 0;
+        var zi;
+        var mxy = 0;
+        var mxz = 0;
+        var myz = 0;
+        var g12;
+        var g22;
+        var d1;
+        var d2;
+        var xOffset;
+        var yOffset;
+        var centreX;
+        var centreY;
+        var magnitude;
+        var direction;
+
+        for (i = 0; i < xVectors.length; i++) {
+            xi = xVectors[i] - xMean;
+            yi = yVectors[i] - yMean;
+            mxx += xi * xi;
+            myy += yi * yi;
+            zi = xi * xi + yi * yi;
+            mxy += xi * yi;
+            mxz += xi * zi;
+            myz += yi * zi;
+        }
+        mxx /= xVectors.length;
+        myy /= xVectors.length;
+        mxy /= xVectors.length;
+        mxz /= xVectors.length;
+        myz /= xVectors.length;
+        g11 = Math.sqrt(mxx);
+        g12 = mxy / g11;
+        g22 = Math.sqrt(myy - g12 * g12);
+        d1 = mxz / g11;
+        d2 = (myz - g12 * d1) / g22;
+        yOffset = d2 / g22 / 2;
+        xOffset = (d1 - yOffset * g12) / g11 / 2;
+        centreX = xOffset + xMean;
+        centreY = yOffset + yMean;
+        magnitude = Math.sqrt(centreX * centreX + centreY * centreY);
+        direction = 180 * Math.atan(centreX / centreY) / Math.PI;
+        if (centreY > 0) {
+            direction = (direction + 180) % 360;
+        }
+        else {
+            direction = (direction + 360) % 360;
+        }
+        return {
+            magnitude: magnitude,
+            direction: direction
+        };
+    },
+
+    getEarthSize: function() {
+        return EARTHRAD;
+    },
+
     getElevation: function(coords, recall, index, glideralt) {
         var elevation;
         $.ajax({

@@ -1,4 +1,5 @@
 //given the igc data and task returns speed, distance flown
+//Also calculates data on individual thermals
 (function() {
     var flight = require('./igc');
     var task = require('./task');
@@ -156,6 +157,51 @@
                 }
             }
             return assessment;
+        },
+
+        getWindInfo: function(thermalStart, thermalEnd) {
+
+            function getVectors(index) { //Private function.  Gets x and y vectors to next fix point
+                //Use Pythagoras, as distances are small, and we're doing lots of calculations
+                var EARTHRAD = utils.getEarthSize();
+                var x = (flight.latLong[index + 1].lng - flight.latLong[index].lng) * Math.cos(Math.PI * (flight.latLong[index + 1].lat + flight.latLong[index].lat) / 360);
+                var y = (flight.latLong[index + 1].lat - flight.latLong[index].lat);
+                var interval = flight.recordTime[index + 1] - flight.recordTime[index];
+                var vectorY = 1000 * y * Math.PI * EARTHRAD / 180 / (flight.recordTime[index + 1] - flight.recordTime[index]);
+                var vectorX = 1000 * x * Math.PI * EARTHRAD / 180 / (flight.recordTime[index + 1] - flight.recordTime[index]);
+                return {
+                    xVector: vectorX,
+                    yVector: vectorY
+                };
+            }
+            var xVectors = [];
+            var yVectors = [];
+            var cuSumX = 0;
+            var cuSumY = 0;
+            var vectors;
+            var xMean;
+            var yMean;
+            var i = thermalStart;
+            do {
+                vectors = getVectors(i);
+                xVectors.push(vectors.xVector);
+                cuSumX += vectors.xVector;
+                yVectors.push(vectors.yVector);
+                cuSumY += vectors.yVector;
+                i++;
+            }
+            while (i < thermalEnd);
+            xMean = cuSumX / xVectors.length;
+            yMean = cuSumY / yVectors.length;
+            // We now have an array of vectors for all fix points in the thermal
+            //If we assume constant airspeed and constant wind speed these should plot into a circle.
+            //The vector from the origin to the circle centre represents wind speed and direction
+            //So we now perform a regression analysis to find it
+            var circleData = utils.kasaRegress(xVectors, yVectors, xMean, yMean);
+            return {
+                speed: 3.6 * circleData.magnitude,
+                direction: circleData.direction
+            };
         }
     }
 }())

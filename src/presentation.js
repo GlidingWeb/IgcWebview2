@@ -452,6 +452,8 @@
         reportThermal: function(index) {
             var heightGain;
             var thermalData = flight.getThermalInfo(index);
+            var analyse = require('./analyse');
+            var windInfo = analyse.getWindInfo(thermalData.entryIndex, thermalData.exitIndex);
             var entryHeight = prefs.showAltitude(flight.pressureAltitude[thermalData.entryIndex], flight.gpsAltitude[thermalData.entryIndex], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
             var exitHeight = prefs.showAltitude(flight.pressureAltitude[thermalData.exitIndex], flight.gpsAltitude[thermalData.exitIndex], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
             $('#thermalEntry').text(utils.unixToString(thermalData.entryTime) + " at " + entryHeight.altPos + entryHeight.descriptor);
@@ -464,6 +466,7 @@
                 heightGain = flight.pressureAltitude[thermalData.exitIndex] - flight.pressureAltitude[thermalData.entryIndex];
             }
             $('#thermalClimb').text(prefs.showClimb(heightGain / (thermalData.exitTime - thermalData.entryTime)));
+            $('#windInfo').text(prefs.showCruise(windInfo.speed) + " from " + Math.round(windInfo.direction));
         },
 
         reportHeightInfo: function(index) {
