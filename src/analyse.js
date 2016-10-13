@@ -30,7 +30,7 @@
                     if (sectordefs.use_sector) {
                         bearingOut = (task.bearing[i] + 180) % 360;
                         bisector = task.bearing[i - 1] + (bearingOut - task.bearing[i - 1]) / 2;
-                        if (Math.abs(bearingOut - task.bearing[i]) > 180) {
+                        if (Math.abs(bearingOut - task.bearing[i-1]) < 180) {
                             bisector = (bisector + 180) % 360;
                         }
                         limits.max = bisector + sectordefs.sector_angle / 2;
@@ -83,7 +83,7 @@
                 }
             }
             if ((curLeg > 0) && (curLeg < task.coords.length)) { // if started
-                nextstatus = utils.toPoint(task.coords[curLeg], flight.latLong[i]); //distance to next turning point
+                nextstatus = utils.toPoint(flight.latLong[i],task.coords[curLeg]);   //distance and bearing to  next turning point
                 turned = false;
                 if (curLeg === task.coords.length - 1) { // If we are on the final leg
                     if (nextstatus.distance < prefs.sectors.finrad) {

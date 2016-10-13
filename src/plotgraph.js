@@ -145,6 +145,11 @@
             });
         },
 
+        replot: function() {
+            $('#barogram').text('');
+            this.plot();
+        },
+ 
         lockCrosshair: function(pos) {
             baro.lockCrosshair(pos);
         }

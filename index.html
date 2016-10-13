@@ -9,8 +9,8 @@
    <body>
       <button id='help'>Help</button>
       <button id='about'>About</button>
-      <div id='titlediv'>
          <h1>IGC Webview</h1>
+    <div id='titlediv'>
          <p>
             A free browser-based tool for viewing IGC format tracks and barograph traces from gliding loggers.
          </p>
@@ -36,10 +36,10 @@
          </p>
       </div>
       <div class="halfwidth">
-         <div>
+          <div class='colour'>
             <h2> Preferences </h2>
             <button class='toggle'>Hide</button>
-            <div class='hideable'>
+            <div class='hideable' id='prefs'>
                <p>
                   <button id="unitconfig">Units</button>
                   &nbsp;<button id="sectorconfig">Sectors</button>
@@ -87,7 +87,7 @@
                </p>
             </div>
          </div>
-         <div id="task">
+         <div id="task" class='colour'>
             <h2> Task </h2>
             <button class='toggle'>Hide</button>
             <div>
@@ -107,6 +107,7 @@
                   <tr>
                      <th>Date:</th>
                      <td id='datecell'></td>
+                    </tr>
                </tbody>
                <tbody id="headers">
                </tbody>
@@ -114,17 +115,27 @@
         
       </div>
       <br clear='all'>
-         <div id="mapWrapper" class='halfwidth' >
+      <div id='infobox'>
+         <div id="mapwrapper" class='halfwidth' >
+                              <button id='showmap'>Map</button>
+         <div id='mapbuttons'> 
+               <button id="showzoom">Zoom  to...</button>
+               &#8197; 
+               <button id="showgraph">Barogram</button>
+            </div>
             <div id="map"></div>
+            <div id='zoomdiv'>
             <p><span id='zoomlabel'>Zoom:</span>
-               <button id="zoomtrack" class='floatright'>Track</button>&nbsp;&nbsp;<span id="taskbuttons"></span>
+               <button id="zoomtrack" class='floatright zoombutton'>Track</button>&nbsp;&nbsp;<span id="taskbuttons"></span>
             </p>
+            </div>
          </div>
          <div id="righthalf" class='halfwidth'>
             <div id='barogram'></div>
             <div id="slider">
                <input type="range" id="timeSlider" step="1" value="0" min="0" max="100" />
             </div>
+            <div id='poswrapper'>
             <div class='container'>
                <div id='showposition'>
                   <p id="timePositionDisplay" style="margin-top: 0px"></p>
@@ -134,7 +145,8 @@
                   <button  class='floatright' id='thermal'>Thermal detail</button>
                </div>
             </div>
-            <p><button id="analyse"> Analyse task</button></p>
+            <button id="analyse"> Analyse task</button>
+         </div>
          </div>
       <div id="taskdata" class='easyclose'>
          <p id="takeoff"></p>
@@ -144,7 +156,7 @@
          <p id="flighttime"></p>
          <button class="closewindow">Close</button>
       </div>
-      <div id="sectordefs" class='easyclose'>
+      <div id="sectordefs" class='easyclose dialog'>
          <h3>Control Sectors</h3>
          <p>
             <b>Start Line:</b><br/>Radius: <input id="startrad" type="text" value="5.0"/>Km
@@ -168,11 +180,11 @@
          <button class="closewindow">Cancel</button>
          <button id="setsectors" class="closewindow">Apply</button>
       </div>
-      <div id='setunits' class='easyclose'>
+      <div id='setunits' class='easyclose dialog'>
          <p><b>Select units:</b> </p>
          <p>
             Altitude: 
-            <select id="altitudeunits">
+            <select id="altitudeunits" class="inbutton">
                <option value="ft" selected>Feet</option>
                <option value="mt">Metres</option>
             </select>
@@ -210,7 +222,7 @@
          </p>
          <button class="closewindow floatright">Close</button>
       </div>
-      <div id='setenl' class='easyclose'>
+      <div id='setenl' class='easyclose dialog'>
          <p><b>ENL engine detect:</b> <input type="radio" name="enldetect" value="Off" checked>Off&nbsp;  <input type="radio" name="enldetect" value="On">On
          <p>Threshold: <input type='text' id="enlthreshold" value='500'> (1-1000)</p>
          <p>Time required: <input type='text' id="enltime" value='12'> seconds</p>
@@ -220,7 +232,7 @@
          <button id="cancelenl" class="closewindow">Cancel</button>
          <button id="applyenl" class="floatright closewindow">Apply</button>
       </div>
-      <div id='setaltref'  class='easyclose'>
+      <div id='setaltref'  class='easyclose dialog'>
          <h3>Altitude reference</h3>
          <p>*Standard (STD) <input type='radio' name='alttype'  id='std' value='std'/><br />
             QFE take off <input type='radio'  name='alttype'   id='QFE'  value='QFE'  checked='checked' /><br />
@@ -251,6 +263,7 @@
          <p><b>Estimated wind:</b> <span id='windInfo'></span>&deg;</p> 
          <button class="floatright closewindow">Close</button>
       </div>
+     </div>
       <script src="bundle.js"></script>
    </body>
 </html>

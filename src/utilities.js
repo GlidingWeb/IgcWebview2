@@ -182,6 +182,7 @@ module.exports = {
             bearing: brng
         };
     },
+    
     targetPoint: function(start, distance, bearing) {
         var lat1 = start.lat * Math.PI / 180;
         var lng1 = start.lng * Math.PI / 180;

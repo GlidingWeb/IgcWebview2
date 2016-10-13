@@ -160,6 +160,7 @@
                 icon: pinicon,
                 clickable: false
             });
+           return true;
         },
 
         setBounds: function(bounds) {
@@ -329,6 +330,10 @@
             pin.setMap(mapObj);
         },
 
+        resizeMap: function() {
+            google.maps.event.trigger(mapObj,'resize');
+        },
+ 
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);
             var gliderpos = new google.maps.LatLng(position);

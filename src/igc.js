@@ -53,7 +53,6 @@
         var travelled;
         turnRate.push(0);
         groundSpeed.push(0);
-
         for (j = 1; j < recordTime.length - 1; j++) {
             nextBearing = utils.toPoint(latLong[j], latLong[j + 1]).bearing;
             deltaBearing = Math.round((360 + nextBearing - prevBearing) % 360);
@@ -308,7 +307,7 @@
                             if (positionData.pressureAltitude > 0) { //determine whether pressure altitude is available
                                 hasPressure = true;
                             }
-                            if (recordTime.length === 0) {
+                            if (recordTime.length === 1) {
                                 firstFix = positionData.recordTime;
                             }
                             if (positionData.latLong.lat > bounds.north) { //This will mean that the track bounds are returned with the file.
@@ -338,7 +337,6 @@
                 i++;
             }
             takeOff.gps = gpsAltitude[i];
-
             recordInterval = Math.round((recordTime[recordTime.length - 1] - recordTime[0]) / recordTime.length);
             var i = 1;
             var j = recordTime.length - 1;

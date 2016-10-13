@@ -16,6 +16,24 @@
         mapControl.zapTask();
     }
 
+function waitForMap(interval,counter) {
+    if (haveMap){
+        return;
+    }
+    else{
+            counter++;
+            if(counter > 10) {
+                alert("Map Load Failed");
+                return;
+            }
+        else {
+             setTimeout(function(){
+            waitForMap(interval,counter);
+            });
+    }
+}
+}
+
     function enterTask(points, zoomto) {
         task.createTask(points);
         var distance = task.getTaskLength();
@@ -35,7 +53,7 @@
                 default:
                     pointlabel = "TP" + i.toString();
             }
-            $('#taskbuttons').append('&nbsp;<button>' + pointlabel + '</button>');
+            $('#taskbuttons').append("&nbsp;<button class='zoombutton'>" + pointlabel + '</button>');
         }
         $('#tasklength').text("Task distance: " + prefs.showDistance(distance));
         $('#task').show();
@@ -45,6 +63,7 @@
         $('#taskbuttons button').on('click', function(event) {
             var li = $(this).index();
             mapControl.showTP(task.coords[li]);
+            $('#zoomdiv').css('zIndex',1);
         });
     }
 
@@ -56,8 +75,9 @@
         var headerBlock = $('#headers');
         var headerIndex;
         headerBlock.html('');
+        //force word-wrap after commas by inserting zero-width space- relevant to small screens
         for (headerIndex = 0; headerIndex < headerList.length; headerIndex++) {
-            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value + "</td></tr>");
+            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value.replace(',',',&#8203;') + "</td></tr>");
         }
     }
 
@@ -268,10 +288,10 @@
             }
             displaySentence += " <b>Altitude:</b>&nbsp;" + altInfo.displaySentence + ":";
             if (climbRate !== null) {
-                displaySentence += " <b>Vario:</b> " + prefs.showClimb(climbRate) + ":";
+                displaySentence += " <b>Vario:</b>&nbsp;" + prefs.showClimb(climbRate) + ":";
             }
             if (flightMode === "Cruising") {
-                displaySentence += " <b>Ground speed:</b>&nbsp;" + prefs.showCruise(flight.groundSpeed[index]);
+                displaySentence += " <b>Ground&nbsp;speed:</b>&nbsp;" + prefs.showCruise(flight.groundSpeed[index]);
             }
             $('#timePositionDisplay').html(displaySentence);
             var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
@@ -334,14 +354,16 @@
             else {
                 $('#P').attr('disabled', false);
             }
+            waitForMap(10,0);        //Map load is asyncronous- need to check it's available
             $('#righthalf').css('visibility', 'visible');
+            $('#infobox').css('visibility', 'visible');
             var tzBack = this.getGeoInfo.bind(this);
             utils.getLocalInfo(flight.unixStart[0], flight.latLong[0], flight.timeZone, tzBack);
             displayHeaders(flight.headers);
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
             mapControl.setBounds(flight.bounds);
-            $('#map').css('visibility', 'visible');
+            $('#mapWrapper').css('visibility', 'visible');
             $.when(utils.getAirspace(flight.bounds, 20)).done(function(args) {
                 mapControl.setAirspace(args);
                 mapControl.showAirspace();
@@ -360,6 +382,7 @@
                     zapTask();
                 }
             }
+             document.getElementById('map').scrollIntoView();
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
         },
@@ -368,6 +391,7 @@
             if (flight) {
                 mapControl.setBounds(flight.bounds);
             }
+             $('#zoomdiv').css('zIndex',1);
         },
 
         showAltPreferences: function() {

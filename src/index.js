@@ -1,10 +1,11 @@
 // This is the entry point for the build.  Contains basic user interaction code.
 (function() {
     var apiKeys = require('./apikeys');
-
+    var haveMap;
     window.ginit = function() { //Callback after maps api loads.  Must be in global scope
+        $('#mapWrapper').show();
         var map = require('./mapctrl');
-        map.initmap();
+        window.haveMap=map.initmap();
     };
 
     window.importTask = function(points) {
@@ -12,6 +13,9 @@
         present.showImported(points);
         return "Task Entered";
     };
+
+
+var doit;
 
     var script = document.createElement('script');
     script.type = 'text/javascript';
@@ -28,7 +32,7 @@
         var igcFile = require('./igc');
         preference.getStoredValues();
         present.showPreferences();
-
+        document.getElementById('help').scrollIntoView();     
         $("#igc").prop("checked", true); //Firefox ignores markup on refresh
 
         $('#fileControl').change(function() {
@@ -52,6 +56,20 @@
             }
         });
 
+resizedw= function() {
+   if($('#righthalf').css('visibility')==='visible') {
+    var plot= require('./plotgraph');
+    var mapctrl=require('./mapctrl');
+    plot.replot();
+    mapctrl.resizeMap();
+}
+};
+    
+window.onresize = function(){
+  clearTimeout(doit);
+  doit = setTimeout(resizedw, 100);
+};
+        
         $('.closewindow').click(function() {
             $('.easyclose').hide();
             $('#timeSlider').focus();
@@ -99,7 +117,7 @@
             preference.setLengthUnits($(this).val());
             present.lengthChange();
         });
-
+    
         $('#cruiseunits').change(function() {
             preference.setCruiseUnits($(this).val());
         });
@@ -193,5 +211,34 @@
             preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(), $("input[name='altsource']").filter(':checked').val());
             present.altChange(parseInt($('#timeSlider').val(), 10));
         });
+          
+         $('#showgraph').click(function() {
+            $(this).parent().hide();
+            $('#map').css('zIndex',1);
+            $('#barogram').css('zIndex',10);
+             $('#showmap').show();
+         });
+         
+         $('#showmap').click(function() {
+             $('#map').css('zIndex', 10);
+             $('#barogram').css('zIndex',1);
+             $('#mapbuttons').show();;
+              $(this).hide();
+         });
+         
+         $('#showzoom').click(function() {
+             $('#zoomdiv').css('zIndex',25);
+             $('#zoomlabel').hide();
+         });
+
+        $('button.toggle').click(
+          function () {
+            $(this).next().toggle();
+            if ($(this).next().is(':visible')) {
+              $(this).text('Hide');
+            } else {
+              $(this).text('Show');
+            }
+          });
     });
 })();

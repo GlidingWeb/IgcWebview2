@@ -217,13 +217,13 @@
             var retval;
             switch (units.cruise) {
                 case 'kph':
-                    retval = Math.round(speed) + " km/hr";
+                    retval = Math.round(speed) + "\u00A0km/hr";
                     break;
                 case 'kt':
-                    retval = Math.round(KM2NM * speed) + " kt";
+                    retval = Math.round(KM2NM * speed) + "\u00A0kt";
                     break;
                 case 'mph':
-                    retval = Math.round(KM2MILES * speed) + " miles/hr";
+                    retval = Math.round(KM2MILES * speed) + "\u00A0miles/hr";
                     break;
             }
             return retval;
@@ -232,11 +232,11 @@
         showDistance: function(distance) {
             var retvalue;
             if (units.distance === 'km') {
-                retvalue = distance.toFixed(1) + " Km";
+                retvalue = distance.toFixed(1) + "\u00A0Km";
             }
             else {
                 var miles = distance * KM2MILES;
-                retvalue = miles.toFixed(1) + " miles";
+                retvalue = miles.toFixed(1) + "\u00A0miles";
             }
             return retvalue;
         },
@@ -245,10 +245,10 @@
             var descriptor;
             if (units.task === 'mph') {
                 speed *= KM2MILES;
-                descriptor = " miles/hr";
+                descriptor = "\u00A0miles/hr";
             }
             else {
-                descriptor = " km/hr";
+                descriptor = "\u00A0km/hr";
             }
             return speed.toFixed(2) + descriptor;
         },
@@ -258,14 +258,14 @@
             switch (units.climb) {
                 case 'kt':
                     climbRate *= MPS2KNOT;
-                    retval = climbRate.toFixed(1) + " knots";
+                    retval = climbRate.toFixed(1) + "\u00A0knots";
                     break;
                 case 'mps':
-                    retval = climbRate.toFixed(1) + ' m/s';
+                    retval = climbRate.toFixed(1) + '\u00A0m/s';
                     break;
                 case 'fpm':
                     climbRate *= MPS2FPM;
-                    retval = Math.round(climbRate) + " ft/min";
+                    retval = Math.round(climbRate) + "\u00A0ft/min";
             }
             if (climbRate > 0) {
                 retval = "+" + retval;
@@ -278,11 +278,11 @@
             var descriptor;
             if (units.altitude == 'ft') {
                 retval = Math.round(METRE2FOOT * metres);
-                descriptor = " feet";
+                descriptor = "\u00A0feet";
             }
             else {
                 retval = Math.round(metres);
-                descriptor = " metres";
+                descriptor = "\u00A0metres";
             }
             return {
                 showval: retval,
@@ -298,12 +298,12 @@
             if (this.altPrefs.altsource === 'P') {
                 metreval = pressureAlt;
                 takeoff = toPressure;
-                source = " (baro) ";
+                source = "&nbsp;(baro)&nbsp;";
             }
             else {
                 metreval = gpsAlt;
                 takeoff = toGps;
-                source = " (GPS) ";
+                source = "&nbsp;(GPS)&nbsp;";
             }
             switch (this.altPrefs.altref) {
                 case 'QFE':
