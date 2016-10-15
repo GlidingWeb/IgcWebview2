@@ -56,11 +56,16 @@
          <h2>Select Task Source</h2>
          <button class='toggle'>Hide</button>
          <div>
-            <p><span class='nowrap'><label for='igc'>IGC File</label><input type='radio' name='tasksource'  value='igc' id='igc' checked="checked" /></span>
-               <span class='nowrap'><label for='user'>User entry</label><input type='radio' name='tasksource'  value='user' id='user'/></span>
-               <span class='nowrap'><label for='xcplan'>XCWebPlan (world)</label><input type='radio' name='tasksource'  value='xcplan' id='world'/></span>
-               <span class='nowrap'><label for='xcplan'>XCWebPlan (UK)</label><input type='radio' name='tasksource'  value='xcplan' id='uk'/></span>
-               <span class='nowrap'><label for='nix'>None</label><input type='radio' name='tasksource'  value='nix' id='nix'/> </span>
+            <p><span class='nowrap'><input type='radio' name='tasksource'  value='igc' id='igc' checked="checked" />
+               <label for='igc'>IGC File</label></span>
+               <span class='nowrap'><input type='radio' name='tasksource'  value='user' id='user'/>
+               <label for='user'>User entry</label></span>
+               <span class='nowrap'><input type='radio' name='tasksource'  value='xcplan' id='world'/>
+               <label for='world'>XCWebPlan (world)</label></span>
+              <span class='nowrap'><input type='radio' name='tasksource'  value='xcplan' id='uk'/>
+                <label for='uk'>XCWebPlan (UK)</label></span>
+               <span class='nowrap'><input type='radio' name='tasksource'  value='nix' id='nix'/>
+               <label for='nix'>None</label></span>
             </p>
             <div id='taskentry'>
                <p>You may enter <a href="http://www.spsys.demon.co.uk/turningpoints.htm" target="_blank">BGA trigraphs</a>, six
@@ -139,6 +144,7 @@
                </div>
             </div>
             <button id="analyse"> Analyse task</button>
+         </div>
          </div>
          </div>
       <div id="taskdata" class='easyclose'>
@@ -256,7 +262,6 @@
          <p><b>Estimated wind:</b> <span id='windInfo'></span>&deg;</p> 
          <button class="floatright closewindow">Close</button>
       </div>
-     </div>
       <script src="bundle.js"></script>
    </body>
 </html>
