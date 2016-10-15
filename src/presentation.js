@@ -12,6 +12,7 @@
     function zapTask() {
         $('#taskentry').hide();
         $('#task').hide();
+        $('#taskbuttons').html('');
         task.clearTask();
         mapControl.zapTask();
     }
