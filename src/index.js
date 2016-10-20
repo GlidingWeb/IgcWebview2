@@ -35,6 +35,18 @@ var doit;
         document.getElementById('help').scrollIntoView();     
         $("#igc").prop("checked", true); //Firefox ignores markup on refresh
 
+        $('#help').click(function() {
+            window.open("igchelp.html", "_blank");
+        });
+        
+          $('#about').click(function () {
+          window.open("igcabout.html", "_blank");
+        });
+          
+       $('#help').click(function () {
+          window.open("igchelp.html", "_blank");
+        });
+        
         $('#fileControl').change(function() {
             if (this.files.length > 0) {
                 var reader = new FileReader();
@@ -89,10 +101,6 @@ window.onresize = function(){
 
         $('#zoomtrack').click(function() {
             present.zoomTrack();
-        });
-
-        $('#help').click(function() {
-            present.showPreferences();
         });
 
         $('#airclip').change(function() {
@@ -165,6 +173,10 @@ window.onresize = function(){
 
         $('#enldefaults').click(function() {
             present.showEnlPrefs('default');
+        });
+        
+        $('#enlhelp').click(function () {
+          window.open("igchelp.html#enl", "_blank");
         });
 
         $('#applyenl').click(function() {

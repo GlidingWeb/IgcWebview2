@@ -162,25 +162,41 @@
          </p>
          <p>
             <b>Turning Points:</b><br/>
-            Circle radius:  <input id="tpbarrelrad" type="text" value="0.5"/>Km <input id="tpbarrel" type="checkbox" checked/><br/>
-            Sector: 
+            <div class='checklabel'>Circle:</div>
+            <div class="modcheck">
+  		<input type="checkbox"  id="tpbarrel"/>
+	  	<label for="tpbarrel"></label>
+  	</div>
+  	&nbsp; radius:  <input id="tpbarrelrad" type="text" value="0.5"/>Km
+  	</p>
+            <div class='checklabel'>Sector:</div> 
+            <div class="modcheck">
+  		<input type="checkbox"  id="tpsector" />
+	  	<label for="tpsector"></label>
+  	</div>
             <select id="subtends" class="inbutton">
                <option value="90" selected>90&deg;</option>
                <option value="180">180&deg;</option>
             </select>
-            &nbsp;radius: <input id="tpsectorrad" type="text" value="15"/>Km <input type="checkbox" id="tpsector" checked/>
+            &nbsp;radius: <input id="tpsectorrad" type="text" value="15"/>Km  
          </p>
          <p>
-            <b>Finish:</b><br/>Radius: <input id="finishrad" type="text" value="1.0"/>Km<br/>
-            <input type="radio" name="finishtype" value="line" checked> Line&nbsp;  <input type="radio" name="finishtype" value="circle">Circle
+            <b>Finish:</b><br/>Radius: <input id="finishrad" type="text" value="1.0"/> Km
+            <input type="radio" name="finishtype" value="line" id='line' checked>  <label for='line'>Line</label>
+            &nbsp;  <input type="radio" name="finishtype" value="circle" id='circle'><label for='circle'>Circle</label>
          </p>
-         <button id="tpdefaults">Restore defaults</button>
-         <p>Save configuration:  <input id="savesectors" type="checkbox"></p>
+         <p><button id="tpdefaults">Restore defaults</button></p>
+         <div class='checklabel'>Save configuration:</div>
+         <div class="modcheck">
+  		<input type="checkbox"  id="savesectors"/>
+	  	<label for="savesectors"></label>
+  	</div>
+      <br><br>
          <button class="closewindow">Cancel</button>
-         <button id="setsectors" class="closewindow">Apply</button>
+         <button id="setsectors" class="closewindow floatright">Apply</button>
       </div>
       <div id='setunits' class='easyclose dialog'>
-         <p><b>Select units:</b> </p>
+         <h3>Select units:</h3>
          <p>
             Altitude: 
             <select id="altitudeunits" class="inbutton">
@@ -222,26 +238,31 @@
          <button class="closewindow floatright">Close</button>
       </div>
       <div id='setenl' class='easyclose dialog'>
-         <p><b>ENL engine detect:</b> <input type="radio" name="enldetect" value="Off" checked>Off&nbsp;  <input type="radio" name="enldetect" value="On">On
+         <p><b>ENL engine detect:</b> <input type="radio" name="enldetect" value="Off" id='enloff' checked><label for='enloff'>Off</label>
+         &nbsp;  <input type="radio" name="enldetect" value="On" id='enlon'><label for='enlon'>On</label>
          <p>Threshold: <input type='text' id="enlthreshold" value='500'> (1-1000)</p>
          <p>Time required: <input type='text' id="enltime" value='12'> seconds</p>
          <button id="enlhelp">Help</button>  
          <button id="enldefaults" class="floatright">Restore defaults</button>
-         <p>Save configuration:  <input id="saveenl" type="checkbox" checked=false></p>
+        <p><div class='checklabel'>Save configuration:</div>
+         <div class="modcheck">
+  		<input type="checkbox"  id="saveenl"/>
+	  	<label for="saveenl"></label>
+  	</div></p>
          <button id="cancelenl" class="closewindow">Cancel</button>
          <button id="applyenl" class="floatright closewindow">Apply</button>
       </div>
       <div id='setaltref'  class='easyclose dialog'>
          <h3>Altitude reference</h3>
-         <p>*Standard (STD) <input type='radio' name='alttype'  id='std' value='std'/><br />
-            QFE take off <input type='radio'  name='alttype'   id='QFE'  value='QFE'  checked='checked' /><br />
-            QNH, ref sea level <input type='radio' name='alttype'  id='QNH' value='QNH' />
+         <p> <input type='radio' name='alttype'  id='std' value='std'><label for='std'>*Standard (STD)</label><br />
+            <input type='radio'  name='alttype'   id='QFE'  value='QFE' checked='checked' ><label for='QFE'>QFE take off </label><br />
+            <input type='radio' name='alttype'  id='QNH' value='QNH' ><label for='QNH'>QNH, ref sea level </label>
          </p>
          <p>*With pressure source, reference 1013.25 mb.  With GPS, raw file data</p>
          <br />
          <h3>Data Source</h3>
-         <p>Pressure <input type='radio'  name='altsource'  id='P'  value='P'  checked='checked' /> &nbsp;
-            GPS <input type='radio' name='altsource' id='G'  value='G' />
+         <p> <input type='radio'  name='altsource'  id='altp'  value='P'  checked='checked'><label for='altp'>Pressure </label> &nbsp;
+             <input type='radio' name='altsource' id='G'  value='G' ><label for='G'>GPS</label>
          </p>
          <p><button  id="althelp">Help</button></p>
          <button id="restorealtref" class="closewindow">Cancel</button>

@@ -21,6 +21,7 @@ h2 {
 h3 {
     text-align: center;
     font-size: 1.2em;
+    margin-top: 5px;
 }
     
 #requestdata {
@@ -131,7 +132,7 @@ input[name="tasksource"] {
     left: 0;
     right: 0;
     width: 18em;
-    height: 370px;
+    height: 480px;
     padding: 15px;
     margin: auto;
     border-style: solid;
@@ -190,7 +191,7 @@ button.floatright {
 }
 
 #setaltref {
-    height: 400px;
+    height: 500px;
 }
 
 #enlthreshold, #enltime {
@@ -214,7 +215,7 @@ margin-top: -20px;
     border-width: 2px;
     overflow: auto;
     width: 22em;
-    padding: 15px;
+    padding: 0px 15px;
     font-size: 0.9em;
     z-index: 2000;
     background-color: white;
@@ -227,7 +228,7 @@ margin-top: -20px;
 }
 
 #sectordefs {
-    height: 400px;
+    height: 500px;
 }
 
 #sectordefs input[type='text'] {
@@ -241,7 +242,51 @@ margin-top: -20px;
 #infobox {
 visibility: hidden;
 }
-    
+
+.checklabel, .modcheck  {
+    display: inline-block;
+}
+   
+.easyclose {
+    line-height: 1.8em;
+}
+
+.modcheck {
+	width: 25px;
+        display: inline-block;
+	position: relative;
+}
+
+.modcheck  label {
+	cursor: pointer;
+	position: absolute;
+	width: 25px;
+	height: 25px;
+	top: 0;
+  	left: 0;
+	background: #eee;
+	border:1px solid #000000;
+}
+
+.modcheck  label::after {
+       opacity: 0;
+	content: '';
+	position: absolute;
+	width: 9px;
+	height: 5px;
+	background: transparent;
+	top: 6px;
+	left: 7px;
+	border: 3px solid #333;
+	border-top: none;
+	border-right: none;
+	transform: rotate(-45deg);
+}
+
+.modcheck input[type=checkbox]:checked + label::after {
+	opacity: 1;
+}
+
  @media screen and (min-width: 900px) {
 
  h1 {
@@ -312,25 +357,28 @@ button.toggle {
       cursor: pointer;
   }
     
-input[name="tasksource"] {
+input[type="radio"] {
     display:none; 
 }
 
-input[name="tasksource"]  + label {
+input[type="text"] {
+    height: 30px;
+}
+
+input[type="radio"]  + label {
     display:inline-block;
-    background-color:#ddd;
+    background-color:#E8E8E8;
     padding:4px 11px;
     margin: 4px 4px;
     font-family:Arial;
     font-size:16px;
 }
 
-input[name="tasksource"]:checked + label { 
-    background-color:#bbb;
+input[type="radio"]:checked + label { 
+    background-color:#BBBBBB;
 }
 
-
-    h1 {
+h1 {
      font-size: 2em;
  }
     
@@ -412,6 +460,7 @@ z-index: 1;
 #poswrapper {
     position: absolute;
     top: 75vh;
+    margin: 0px 20px;
 }
 
 button.toggle {
@@ -420,7 +469,7 @@ margin-top: 0px;
 margin-bottom: 0px;
 }
 
-button, .inbutton,#fileControl  {
+button, .inbutton,#fileControl,select  {
     height: 33px;
     font-size: 15px;
     margin: 5px;

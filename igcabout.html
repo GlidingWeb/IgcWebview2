@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <title>About IGC Viewer</title>
+    <link rel="stylesheet" href="igctext.css" />
+</head>
+
+<body>
+    <div id='titlediv'>
+        <h1>About IGC Webview</h1>
+        <p> &copy; 2016 Alistair Malcolm Green and Richard Brisbourne </p>
+    </div>
+    <div class="content">
+        <p>
+            IGCWebview is an open source program written almost entirely in Javascript, although it makes use of some server-side php
+            code to interrogate databases. Copyright is held jointly by Alistair M Green and Richard Brisbourne; for further
+            information for how to access the source code see below, for information on how you are entitled to make use
+            of it see the <a href='LICENSE.txt'>licence</a>.
+        </p>
+
+        <h2>Credits</h2>
+
+        <h3>Program code</h3>
+        <p>The Javascript code for the application itself was mostly written by Alistair Green and Richard
+            Brisbourne. However, like most open source projects IGC Webview makes extensive use of third party libraries
+            available under similar open source licences:
+            <ul>
+                <li><a href='https://jquery.com' target='_blank'>JQuery</a>- a javascript library well-known to web developers</li>
+                <li><a href='http://flotcharts.org' target='_blank'>Flot charts</a>- a JQuery add-in for chart plotting</li>
+                <li><a href='https://github.com/markrcote/flot-axislabels' target='_blank'>Flot Axis Labels plugin</a>- for a
+                    full list of contributors see the link</li>
+                <li>Extensive use is made of the <a href='https://developers.google.com/maps/documentation/javascript/' target='_blank'> Google Maps javascript API</a></li>
+            </ul>
+        </p>
+
+        <h3>Data</h3>
+
+Data is drawn from a number of sources- some are license-free, some under the <a href='http://opendatacommons.org/licenses/dbcl/1.0/' target='_blank'>Open Database Contents licence</a>, some under individual licenses.  For further details follow the links:
+
+<p>Of prime importance is mapping- maps are sourced from Google Maps.
+</p>
+
+<p>Timezone and terrain elevation data are source from <a href='https://developers.google.com/maps/web-services/overview' target='_blank'>Google Maps API web services</a>.</p>
+
+<p>We use copies of waypoint files from  the <a href='http://www.gliding.co.uk' target='_blank'>British Gliding Association</a> and the <a href='http://www.segelflug.de/vereine/welt2000/' target='_blank'>Welt 2000</a> database.</p>
+
+<p>We are grateful to Alistair at BlueFlyVario for the clear <a href='http://blueflyvario.blogspot.co.uk/2012/09/calculating-wind-speed-from-gps-track.html' target='_blank'>expositon of the algorithm used for wind calculation</a>.  We know that it is used elsewhere, but this is the only clear write-up we've been able to find on the web.</p>
+
+<p>Airspace data is drawn from a number of places, the largest being <a href='http://soaringweb.org'>soaringweb.org</a>.  Unfortunately very little is available in computer-readable format from official sources so we are dependant on people who work voluntarily to create the files we all use in our software, both on the ground and in our gliders, and who deserve more credit than they often get.  The data in IGCWebview is actually held in tables on the server, so has been arrived at by conversion of some of these files.  In some cases copyright has been asserted on the files, in those cases there are links below to the originals containing copyright statements.  In no case have we used anything that is not licensed for non-commercial use:
+</p>
+
+<ul>
+<li><a href='http://soaringweb.org/Airspace/BR/BRA13A16.sua' target='_blank'>Brazil</a>- Alan Braga</li>
+<li>>Canada- Peter Spear</li>
+<li>Croatia- Henrik Knoblauch</li>
+<li>Denmark- Felipe Cvitanich</li>
+<li><a href='http://soaringweb.org/Airspace/EE/Estonia_Airspace_June_2015.txt' target='_blank'>Estonia</a>- Christoph Gauss</li>
+<li>Finland- Tero Tikkanen</li>
+<li>France- Marc Seretti</li>
+<li>Germany- Peter Kemme</li>
+<li>Great Britain- Geoff Brown</li>
+<li>Hungary- Tamas Gal</li>
+<li>Ireland- Kevin Houlihan</li>
+<li>Latvia, Lithuania- Andrejs Kivackis</li>
+<li>Macedonia- Remko Bolt</li>
+<li>Netherlands- Maurits Dortu</li>
+<li>Norway- Hans Cato Grytnes, Nils Barkald, Ole Bårdtvedt, Lars Rune Bjørnevik, Arne Martin Güettler and Agnar Renolen.</li>
+<li>Poland- Artur Jan Tenenberg</li>
+<li>Slovakia- Ján Hrncírik via Klaus Ertl</li>
+<li>Slovenia- Georg Falkensammer</li>
+<li>Spain-  Durval Henke</li>
+<li>Switzerland-  Reinhold Mueller</li>
+<li>USA-  Lynne Alley</li>
+</ul>
+
+<h2>Developers</h2>
+<p>
+Source code is on <a href="https://github.com/GlidingWeb/FlightView" target='_blank'>GitHub</a>.If you are interested please free to fork - we look forward to the pull requests. 
+For general correspondence and thoughts (technical or otherwise) please
+use the <a href="https://github.com/GlidingWeb/FlightView/issues" target='_blank'>issue tracker</a>
+or send an e-mail to <a href="mailto:igcwebview@glidingweb.org">igcwebview@glidingweb.org</a>.
+</p>
+<button onClick="window.close()">Close window</button>
+</div>
+</body>
+</html>
