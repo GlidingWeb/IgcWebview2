@@ -333,6 +333,10 @@
         resizeMap: function() {
             google.maps.event.trigger(mapObj,'resize');
         },
+        
+         clearPin: function() {
+             pin.setMap(null);
+         },
  
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);

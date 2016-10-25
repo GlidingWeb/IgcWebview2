@@ -427,6 +427,7 @@ function waitForMap(interval,counter) {
                     }
                 }
                 if (taskData.npoints === task.coords.length) { //task completed
+                    mapControl.clearPin();
                     $('#taskcalcs').append("<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed");
                     var elapsedTime = flight.recordTime[taskData.turnIndices[taskData.npoints - 1]] - flight.recordTime[taskData.turnIndices[0]];
                     $('#taskcalcs').append("<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime));

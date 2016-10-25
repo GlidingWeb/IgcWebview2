@@ -238,11 +238,12 @@
             var readEnl = null;
             var positionMatch;
             var cRecords = [];
+            var lRecords = [];
             var firstFix = 0;
             var taskMatch;
             hasPressure = false;
             var positionRegex = /^B([\d]{6})([\d]{7}[NS][\d]{8}[EW])([AV])([-\d][\d]{4})([-\d][\d]{4})/;
-            var taskRegex = /^C([\d]{7})[NS]([\d]{8})[EW].*/;
+            var taskRegex = /^\S*(C[\d]{7}[NS][\d]{8}[EW].*)/;
             clearFlight();
             var igcLines = infile.split("\n");
             if (igcLines.length < 2) {
@@ -285,6 +286,12 @@
                     case 'C':
                         if (taskRegex.test(currentLine)) { //will parse later
                             cRecords.push(currentLine.trim());
+                        }
+                        break;
+                    case 'L':
+                        taskMatch=taskRegex.exec(currentLine);
+                       if(taskMatch) {
+                          lRecords.push(taskMatch[1]);
                         }
                         break;
                     case 'B': // Position fix
@@ -380,7 +387,12 @@
             landingIndex = j;
 
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
-            getTaskPoints(cRecords);
+            if(lRecords.length > 0) {
+                getTaskPoints(lRecords);
+            }
+            else {
+                getTaskPoints(cRecords);
+            }
             secondPass();
         },
 

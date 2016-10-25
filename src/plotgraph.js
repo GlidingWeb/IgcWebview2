@@ -141,6 +141,7 @@
                     present.showPosition(item.dataIndex);
                     $('#timeSlider').val(item.dataIndex);
                     $('#timeSlider').focus();
+                    $('.easyclose').hide();
                 }
             });
         },
