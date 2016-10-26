@@ -1,4 +1,4 @@
-//given the igc data and task returns speed, distance flown
+/given the igc data and task returns speed, distance flown
 //Also calculates data on individual thermals
 (function() {
     var flight = require('./igc');
@@ -30,7 +30,7 @@
                     if (sectordefs.use_sector) {
                         bearingOut = (task.bearing[i] + 180) % 360;
                         bisector = task.bearing[i - 1] + (bearingOut - task.bearing[i - 1]) / 2;
-                        if (Math.abs(bearingOut - task.bearing[i-1]) < 180) {
+                        if (Math.abs(bearingOut - task.bearing[i - 1]) < 180) {
                             bisector = (bisector + 180) % 360;
                         }
                         limits.max = bisector + sectordefs.sector_angle / 2;
@@ -83,7 +83,7 @@
                 }
             }
             if ((curLeg > 0) && (curLeg < task.coords.length)) { // if started
-                nextstatus = utils.toPoint(flight.latLong[i],task.coords[curLeg]);   //distance and bearing to  next turning point
+                nextstatus = utils.toPoint(flight.latLong[i], task.coords[curLeg]); //distance and bearing to  next turning point
                 turned = false;
                 if (curLeg === task.coords.length - 1) { // If we are on the final leg
                     if (nextstatus.distance < prefs.sectors.finrad) {
@@ -159,6 +159,48 @@
             return assessment;
         },
 
+        getThermalCount: function(startIndex, endIndex) {
+            var thermalStart = startIndex;
+            var thermalEnd = 0;
+            var i = startIndex;
+            var thermalData;
+            var circleTime = 0;
+            var thermalClimb = 0;
+            var thermalCount = 0;
+            var thisClimbTime;
+            var windInfo;
+
+            do {
+                do {
+                    i++;
+                }
+                while ((Math.abs(flight.turnRate[i]) < 6) && (i < endIndex));
+                if (i < endIndex) {
+                    thermalData = flight.getThermalInfo(i);
+                    thisClimbTime = flight.recordTime[thermalData.exitIndex] - flight.recordTime[thermalData.entryIndex];
+                    if (thisClimbTime > 30) {
+                        circleTime += thisClimbTime;
+                        if (flight.takeOff.pressure === null) {
+                            thermalClimb += (flight.gpsAltitude[thermalData.exitIndex] - flight.gpsAltitude[thermalData.entryIndex]);
+                        }
+                        else {
+                            thermalClimb += (flight.pressureAltitude[thermalData.exitIndex] - flight.pressureAltitude[thermalData.entryIndex]);
+                        }
+                        thermalCount++;
+                    }
+                    i = thermalData.exitIndex;
+                }
+            }
+            while (i < endIndex);
+            windInfo = this.getWindInfo(startIndex, endIndex);
+            return {
+                circleTime: circleTime,
+                heightGain: thermalClimb,
+                windSpeed: windInfo.speed,
+                windDirection: windInfo.direction
+            };
+        },
+
         getWindInfo: function(thermalStart, thermalEnd) {
 
             function getVectors(index) { //Private function.  Gets x and y vectors to next fix point
@@ -183,11 +225,13 @@
             var yMean;
             var i = thermalStart;
             do {
-                vectors = getVectors(i);
-                xVectors.push(vectors.xVector);
-                cuSumX += vectors.xVector;
-                yVectors.push(vectors.yVector);
-                cuSumY += vectors.yVector;
+                if (Math.abs(flight.turnRate[i]) > 6) {
+                    vectors = getVectors(i);
+                    xVectors.push(vectors.xVector);
+                    cuSumX += vectors.xVector;
+                    yVectors.push(vectors.yVector);
+                    cuSumY += vectors.yVector;
+                }
                 i++;
             }
             while (i < thermalEnd);

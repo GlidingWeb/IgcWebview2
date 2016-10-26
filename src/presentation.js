@@ -410,6 +410,8 @@ function waitForMap(interval,counter) {
             var landingIndex = flight.getLandingIndex();
             var altValue = [];
             var altLoss;
+            var taskEndIndex;
+            
             $('#taskcalcs').html("Take off:  " + showLocalTime(takeOffIndex) + "<br>");
             if (task.coords.length > 1) {
                 var analyse = require('./analyse');
@@ -429,7 +431,8 @@ function waitForMap(interval,counter) {
                 if (taskData.npoints === task.coords.length) { //task completed
                     mapControl.clearPin();
                     $('#taskcalcs').append("<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed");
-                    var elapsedTime = flight.recordTime[taskData.turnIndices[taskData.npoints - 1]] - flight.recordTime[taskData.turnIndices[0]];
+                    taskEndIndex=taskData.turnIndices[taskData.npoints - 1];
+                    var elapsedTime = flight.recordTime[taskEndIndex] - flight.recordTime[taskData.turnIndices[0]];
                     $('#taskcalcs').append("<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime));
                     $('#taskcalcs').append("<br/>Speed: " + prefs.showTaskSpeed(3600 * task.getTaskLength() / elapsedTime));
                     altLoss = altValue[0].altPos - altValue[task.coords.length - 1].altPos;
@@ -446,6 +449,7 @@ function waitForMap(interval,counter) {
                 }
                 else { // GPS landout
                     if (taskData.npoints > 0) {
+                        taskEndIndex=taskData.bestPoint;
                         $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
                         $('#taskcalcs').append("<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]));
                         $('#taskcalcs').append("<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance));
@@ -456,6 +460,15 @@ function waitForMap(interval,counter) {
             $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
             var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
             $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
+            if(taskData.npoints > 0) {
+                 var thermalInfo=analyse.getThermalCount(taskData.turnIndices[0],taskEndIndex);
+                $('#taskcalcs').append("<br/><br/><b>On Task: </b>");
+                 $('#taskcalcs').append("<br/>Time  circling: " + Math.floor(thermalInfo.circleTime/60) + " mins " + thermalInfo.circleTime%60 + " secs");
+                 var altInfo=prefs.displayAlt(thermalInfo.heightGain);
+                 $('#taskcalcs').append("<br/>Height gained: " + altInfo.showval + " " + altInfo.descriptor);
+                  $('#taskcalcs').append("<br/>Average climb: " + prefs.showClimb(thermalInfo.heightGain/thermalInfo.circleTime));
+                  $('#taskcalcs').append("<br/><br/>Task wind: " + prefs.showCruise(thermalInfo.windSpeed) + " from " + Math.round(thermalInfo.windDirection) + "&deg;");
+            }
         },
 
         showQfe: function(elevation, index, glideralt) {

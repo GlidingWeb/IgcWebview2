@@ -132,12 +132,13 @@ input[name="tasksource"] {
     left: 0;
     right: 0;
     width: 18em;
-    height: 480px;
-    padding: 15px;
+    height: 520px;
+    padding: 5px;
     margin: auto;
     border-style: solid;
     border-width: 2px;
     overflow: auto;
+    line-height: 1.2;
     text-align: center;
     z-index: 2000;
     background-color: white;
@@ -170,7 +171,7 @@ input[name="tasksource"] {
     left: 0;
     right: 0;
     width: 20em;
-    height: 280px;
+    height: 380px;
     padding: 15px;
     margin: auto;
     border-style: solid;
