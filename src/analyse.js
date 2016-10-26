@@ -1,4 +1,4 @@
-/given the igc data and task returns speed, distance flown
+//given the igc data and task returns speed, distance flown
 //Also calculates data on individual thermals
 (function() {
     var flight = require('./igc');
