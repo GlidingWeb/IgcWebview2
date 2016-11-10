@@ -10,8 +10,45 @@
   var descriptions = [];
   var legsize = [];
   var bearing = [];
+  var tasktype;
+  var aatradii=[];
+  var aatRange;
+  var aatMins;
 
-
+  function  getAatRange() {
+      var prefs= require('./preferences');
+      var minDistance=0;
+      var maxDistance=0;
+      var i;
+      var bisector;
+      var prevnearest=coords[0]
+      var prevfurthest=coords[0];
+      var minpoint=[];
+      var backbearing;
+      var nearest;
+      var furthest;
+      for(i=1; i < bearing.length-1; i++) {
+       backbearing = (bearing[i+1] + 180) % 360;
+       bisector = bearing[i] + (backbearing - bearing[i]) / 2;
+        if (Math.abs(backbearing - bearing[i]) > 180) {
+            bisector = (bisector + 180) % 360;
+        }
+          furthest= utils.targetPoint(coords[i],aatradii[i-1],bisector);
+          nearest= utils.targetPoint(coords[i],aatradii[i-1],(bisector + 180)%360);
+         minDistance +=utils.toPoint(prevnearest,nearest).distance;
+         maxDistance += utils.toPoint(prevfurthest,furthest).distance;
+         prevnearest=nearest;
+         prevfurthest=furthest;
+      }
+      minDistance+=utils.toPoint(coords[coords.length-1],nearest).distance;
+        maxDistance+=utils.toPoint(coords[coords.length-1],furthest).distance;
+        if(prefs.sectors.finishtype==='circle') {
+            minDistance-=prefs.sectors.finrad;
+            maxDistance-=prefs.sectors.finrad;
+        }
+         return minDistance.toFixed(1) + " / " + maxDistance.toFixed(1) + " Km";
+  }
+  
   module.exports = {
 
     clearTask: function () {
@@ -22,6 +59,8 @@
       descriptions.length = 0;
       legsize.length = 0;
       bearing.length = 0;
+      aatradii.length=0;
+      this.tasktype='trad';
     },
 
     createTask: function (points) {
@@ -55,11 +94,30 @@
     getTaskLength: function () {
       return tasklength;
     },
+ 
+    setAat: function(radii,aattime) {
+        var i;
+        this.tasktype='aat';
+        aatradii.length=0;
+        for(i=0;i < radii.length; i++) {
+            aatradii.push(radii[i]);
+        }
+        this.aatRange=getAatRange();
+        this.aatMins=aattime;
+    },
 
+    setSectorType: function(type) {
+        this.tasktype=type;
+    },
+ 
     names: names,
     labels: labels,
     coords: coords,
     bearing: bearing,
-    legsize: legsize
+    legsize: legsize,
+    aatradii: aatradii,
+    tasktype: tasktype,
+    aatRange: aatRange,
+    aatMins: aatMins
   };
 })();

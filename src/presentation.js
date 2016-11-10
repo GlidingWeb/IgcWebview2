@@ -13,6 +13,7 @@
         $('#taskentry').hide();
         $('#task').hide();
         $('#taskbuttons').html('');
+        $('#trad').prop('checked',true);
         task.clearTask();
         mapControl.zapTask();
     }
@@ -90,9 +91,19 @@ function waitForMap(interval,counter) {
         planWindow.focus();
     }
 
+    function addAatInfo() {
+        var i;
+        for(i=0;i < task.aatradii.length;i++) {
+            $('#taskinfo').find('tr').eq(i+1).append("<td>" + task.aatradii[i] + "Km circle</td>");
+        }
+        $('#tasklength').html("<b>Task size:</b> " + task.aatRange + "&emsp;<b>Time: </b>" + Math.floor(task.aatMins/60) + "hrs " +  task.aatMins%60 + "mins");
+    }
+    
     module.exports = {
 
         setSectors: function() {
+          if( $("input[name='tptype']:checked").val()==='trad') {
+              task.setSectorType('trad');
             var sectors = {
                 startrad: $('#startrad').val(),
                 finrad: $('#finishrad').val(),
@@ -103,12 +114,37 @@ function waitForMap(interval,counter) {
                 use_barrel: $('#tpbarrel').prop('checked'),
                 finishtype: $("input[name=finishtype]:checked").val()
             };
-
+           
             var saveit = $('#savesectors').prop('checked');
             if (prefs.setSectors(sectors, saveit)) {
                 mapControl.addSectors();
                 $('#sectordefs').hide();
             }
+           }
+           else {
+               task.setSectorType('aat');
+               var sectorSize=[];
+               var valsOk= true;
+               var aatmins;
+               $('#aatinfo').find('input').each(function () {
+                 if($.isNumeric(this.value)) {
+                        sectorSize.push(this.value);
+                 }
+                 else {
+                     valsOk=false;
+                 }
+                });
+               aatmins=parseInt(60*$('#aathrs').val()) + parseInt($('#aatmins').val());
+               if(!(valsOk) || !(aatmins))  {
+                   alert("Enter valid radii and task time");
+               }
+               else {
+             task.setAat(sectorSize,aatmins);
+             addAatInfo();
+             mapControl.addSectors();
+             $('#sectordefs').hide();
+               }
+          }
         },
 
         setEnlPrefs: function() {
@@ -183,6 +219,7 @@ function waitForMap(interval,counter) {
             $('#cruiseunits').val(prefs.units.cruise);
             $('#taskunits').val(prefs.units.task);
             $('#airclip').val(prefs.airclip);
+            $("#trad").prop("checked", true);
             this.showSectorPreferences('current');
             this.showEnlPrefs('current');
             this.showAltPreferences();
@@ -294,6 +331,7 @@ function waitForMap(interval,counter) {
             if (flightMode === "Cruising") {
                 displaySentence += " <b>Ground&nbsp;speed:</b>&nbsp;" + prefs.showCruise(flight.groundSpeed[index]);
             }
+            displaySentence+=index;
             $('#timePositionDisplay').html(displaySentence);
             var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
             var yval = altInfo.altPos;
@@ -507,7 +545,32 @@ function waitForMap(interval,counter) {
             $('#thermalClimb').text(prefs.showClimb(heightGain / (thermalData.exitTime - thermalData.entryTime)));
             $('#windInfo').text(prefs.showCruise(windInfo.speed) + " from " + Math.round(windInfo.direction));
         },
-
+   
+        tpchange: function(tptype) {
+            var i;
+            if(tptype==='aat') {
+            if(!task.names.length) {
+            alert("Define turning points first");
+             $("#trad").prop("checked", true);
+               }
+            else {
+             $('#aatinfo').html('');
+             $('#aathrs').val(2);
+             $('#aatmins').val('30');
+            for (i = 1; i < task.names.length-1; i++) {
+                 $('#aatinfo').append('<tr><th>' + task.labels[i] + "</th><td>Circle radius:   <input type='text' id='aatrad" + i + "'> Km</td></tr>");
+            }   
+            $('#tradtp').hide();
+             $('#aatdef').show();
+            }
+            }
+        else {
+             $('#tradtp').show();
+             $('#aatdef').hide();
+              task.setSectorType('trad');
+        }
+        },
+ 
         reportHeightInfo: function(index) {
             var elevation;
             var qnhMetric;

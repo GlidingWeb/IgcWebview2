@@ -87,6 +87,16 @@ window.onresize = function(){
             $('#timeSlider').focus();
         });
 
+  $('input[type=radio][name=tptype]').change(function() {
+      present.tpchange(this.value);
+      });
+  
+        $('#closeSectorDef').click(function() {
+            $('#aatinfo').html('');
+             $("#trad").prop("checked", true);
+             $('#tradtp').show();
+        });
+        
         $('#timeSlider').on('input', function() {
             hiderest();
             var t = parseInt($(this).val(), 10);

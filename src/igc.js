@@ -385,7 +385,7 @@
             }
             takeOffIndex = i - 1;
             landingIndex = j;
-
+           
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
             if(lRecords.length > 0) {
                 getTaskPoints(lRecords);

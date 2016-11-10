@@ -27,7 +27,7 @@
                     limits.min = heading - 90;
                     break;
                 default:
-                    if (sectordefs.use_sector) {
+                    if (sectordefs.use_sector)  {
                         bearingOut = (task.bearing[i] + 180) % 360;
                         bisector = task.bearing[i - 1] + (bearingOut - task.bearing[i - 1]) / 2;
                         if (Math.abs(bearingOut - task.bearing[i - 1]) < 180) {
@@ -56,7 +56,7 @@
         return ((target > min) && (target < max));
     }
 
-    function assessSection(startIndex, endIndex, sectorLimits) {
+    function assessTrad (startIndex, endIndex, sectorLimits) {
         var i = startIndex;
         var curLeg = -1;
         var startstatus;
@@ -137,13 +137,88 @@
         };
     }
 
+function assessAat(startIndex, endIndex, sectorLimits) {
+        var i = startIndex;
+        var curLeg = -1;
+        var startstatus;
+        var distanceToNext;
+        var bestIndex;
+        var currentDistance;
+        var bestThisLeg=0;
+        var nextstatus;
+        var zoneStatus;
+        var refPoint;
+        var legDistance=[];
+        var turnIndex=[];
+        var bestIndex;
+        
+        do {
+        if (curLeg < 2) { //not reached first TP
+                startstatus = utils.toPoint(task.coords[0], flight.latLong[i]); //check if in start zone
+                if ((checkSector(startstatus.bearing, sectorLimits[0])) && (startstatus.distance < prefs.sectors.startrad)) {
+                    curLeg = 0; // we are  in the start zone
+                }
+                else {
+                    if (curLeg === 0) { //if we were in the start zone and now aren't
+                        curLeg = 1; //we're now on the first leg
+                        startIndexLatest = i; //and this is our latest recorded start;
+                        refPoint=task.coords[0];
+                        zoneStatus=0;
+                        legDistance[1]=0;
+                    }
+                }
+            }
+    if ((curLeg > 0) && (curLeg < task.coords.length)) { // if started
+        nextstatus = utils.toPoint(flight.latLong[i], task.coords[curLeg]); //distance and bearing to  next turning point
+        if(nextstatus.distance < task.aatradii[curLeg-1]) {  //if in tpzone
+            zoneStatus=curLeg;
+            currentDistance=utils.toPoint(flight.latLong[i],refPoint).distance;
+        }
+        else {
+            if(zoneStatus > 0) { // coming out of zone
+                turnIndex[curLeg]=bestIndex;
+                curLeg++;
+                console.log("At exit " + bestIndex);
+                legDistance[curLeg]=0;
+                currentDistance=0;
+            }
+            zoneStatus=0;
+            currentDistance= task.legsize[curLeg]-nextstatus.distance;
+        }
+         if(currentDistance > legDistance[curLeg]) {
+                legDistance[curLeg]=currentDistance;
+                bestIndex=i;
+            }
+        if ((i>1270) && (i < 1275)) {
+           console.log("Index: " +i);
+           console.log("Zone: " + zoneStatus);
+           console.log("Leg distance " + legDistance[curLeg]);
+           console.log("Current distance  " + currentDistance);
+           console.log("best index " +turnIndex[1]);
+       }
+       }
+                i++;
+            }
+             while (i < endIndex);
+}
+    
+function assessSection(startIndex, endIndex, sectorLimits) {
+    if(task.tasktype==='trad') {
+        return assessTrad(startIndex, endIndex, sectorLimits);
+}
+else {
+     return assessAat(startIndex, endIndex, sectorLimits);
+}
+      }
+    
     module.exports = {
         assessTask: function() {
             var assessment;
             var tempAssess;
             var bestLength = 0;
+            
             var i;
-            var sectorLimits = getSectorLimits(task, prefs.sectors);
+            var sectorLimits= getSectorLimits(task, prefs.sectors);
             if ((prefs.enlPrefs.detect === 'Off') || (flight.engineRunList.length === 0)) {
                 assessment = assessSection(flight.getTakeOffIndex(), flight.getLandingIndex(), sectorLimits);
             }

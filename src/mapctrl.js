@@ -243,6 +243,7 @@
                 line = drawLine(task.coords[0], task.bearing[1], prefs.startrad);
                 sectorfeatures.push(line);
                 for (i = 1; i < task.names.length - 1; i++) {
+                    if(task.tasktype==='trad') {
                     if (prefs.use_barrel) {
                         circle = sectorCircle(task.coords[i], prefs.tprad);
                         sectorfeatures.push(circle);
@@ -250,6 +251,11 @@
                     if (prefs.use_sector) {
                         sector = drawSector(task.coords[i], task.bearing[i], task.bearing[i + 1], prefs.sector_angle, prefs.sector_rad);
                         sectorfeatures.push(sector);
+                    }
+                    }
+                    else{
+                        circle=sectorCircle(task.coords[i],task.aatradii[i-1]);
+                        sectorfeatures.push(circle);
                     }
                 }
                 if (prefs.finishtype === 'line') {

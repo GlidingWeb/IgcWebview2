@@ -288,6 +288,14 @@ visibility: hidden;
 	opacity: 1;
 }
 
+#aatdef {
+   display:none;
+}
+
+ input[type="number"] {
+     width: 3em;
+ }
+
  @media screen and (min-width: 900px) {
 
  h1 {
