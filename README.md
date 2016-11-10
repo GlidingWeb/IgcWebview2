@@ -1,13 +1,9 @@
-# FlightView
+# IGCWebview2
 
-This application is a work in progress intended to be a port to a modularised version of [IGCWebView](https://github.com/GlidingWeb/IGCWebView), intended to improve load times and simplify maintenance.
+This repository started as a port of  [IGCWebView](https://github.com/GlidingWeb/IGCWebView), intended to improve load times and simplify maintenance.  It has now replaced the original IGCWebview repository for all future development. It holds the code for the current version of  IGC WebView, which can be found at  http://glidingweb.org. 
 
-*IGC Web View* is an IGC viewer written in JavaScript and HTML 5, 
-which is able to run in any modern Web browser. It draws the 
-glider's flight path onto an interactive map, using the 
-[Google Maps Javascript API](https://developers.google.com/maps/documentation/javascript/), and also plots a 
-graph of altitude against time. The responsive layout adjusts itself 
-to fit any screen size, from a large widescreen monitor to a small 
+*IGC Web View2* is an IGC viewer written in JavaScript and HTML 5, 
+which is able to run in any modern Web browser. It loads in files which have been recorded on a logger carried in a glider in the standard .igc format and loads it onto an interactive map, using the [Google Maps Javascript API](https://developers.google.com/maps/documentation/javascript/), and also plots a graph of altitude against time. The responsive layout adjusts itself to fit any screen size, from a large widescreen monitor to a small 
 laptop or even a smartphone.
 
 The application also makes some use of php, and a server side MySQL database containing data on controlled airspace.  The structure of this database is documented in the data_structure.txt file.
@@ -30,7 +26,7 @@ versions.
 
 # Build instructions for developers
 
-IGC Web View is built using [Webpack](https://webpack.github.io), which
+IGC Webview2 is built using [Webpack](https://webpack.github.io), which
 combines all of the JavaScript source code files into a single bundle. This
 reduces the page load time for end users by minimising the number of HTTP requests
 needed to fetch the scripts. Webpack also provides a `require` directive which
