@@ -25,6 +25,7 @@
     },
 
     createTask: function (points) {
+     var prefs=require('./preferences');
       var i;
       var j = 1;
       this.clearTask();
@@ -36,7 +37,7 @@
       bearing[0] = 0;
       var leginfo;
       for (i = 1; i < points.coords.length; i++) {
-        leginfo = utils.toPoint(points.coords[i - 1], points.coords[i]);
+        leginfo = utils.getTrackData(points.coords[i - 1], points.coords[i]);
         //eliminate situation when two successive points are identical (produces a divide by zero error on display.
         //To allow for FP rounding, within 30 metres is considered identical.
         if (leginfo.distance > 0.03) {
@@ -49,13 +50,30 @@
           j++;
         }
       }
+      if(prefs.sectors.finishtype==='circle') {
+          tasklength-= prefs.sectors.finrad;
+      }
+
       labels[labels.length - 1] = "Finish";
     },
 
     getTaskLength: function () {
       return tasklength;
     },
-
+ 
+   setLength: function() {
+        var prefs=require('./preferences');
+       var i;
+       var totalLength=0;
+       for(i=0; i < coords.length; i++) {
+           totalLength+=legsize[i];
+       }
+       if(prefs.sectors.finishtype==='circle') {
+               totalLength-=prefs.sectors.finrad;
+           }
+       tasklength=totalLength;
+   },
+ 
     names: names,
     labels: labels,
     coords: coords,
