@@ -114,9 +114,12 @@ function waitForMap(interval,counter) {
                 use_barrel: $('#tpbarrel').prop('checked'),
                 finishtype: $("input[name=finishtype]:checked").val()
             };
-           
             var saveit = $('#savesectors').prop('checked');
             if (prefs.setSectors(sectors, saveit)) {
+                if(task) {
+                    task.setLength();
+                    $('#tasklength').text("Task distance: " + prefs.showDistance(task.getTaskLength()));
+                }
                 mapControl.addSectors();
                 $('#sectordefs').hide();
             }
@@ -488,7 +491,7 @@ function waitForMap(interval,counter) {
                 else { // GPS landout
                     if (taskData.npoints > 0) {
                         taskEndIndex=taskData.bestPoint;
-                        $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
+                         $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
                         $('#taskcalcs').append("<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]));
                         $('#taskcalcs').append("<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance));
                         mapControl.pushPin(flight.latLong[taskData.bestPoint]);

@@ -66,13 +66,16 @@
         var turned;
         var bestSoFar = 0;
         var bestIndex;
-        tpindices = [];
+        var bestLeg;
+        var tpindices = [];
+        
         do {
             if (curLeg < 2) { //not reached first TP
                 startstatus = utils.toPoint(task.coords[0], flight.latLong[i]); //check if in start zone
                 if ((checkSector(startstatus.bearing, sectorLimits[0])) && (startstatus.distance < prefs.sectors.startrad)) {
                     curLeg = 0; // we are  in the start zone
                     startIndexLatest = i;
+                    distanceToNext=0;
                 }
                 else {
                     if (curLeg === 0) { //if we were in the start zone and now aren't
@@ -83,7 +86,7 @@
                 }
             }
             if ((curLeg > 0) && (curLeg < task.coords.length)) { // if started
-                nextstatus = utils.toPoint(flight.latLong[i], task.coords[curLeg]); //distance and bearing to  next turning point
+                nextstatus = utils.toPoint(flight.latLong[i], task.coords[curLeg]); //distance and bearing to  next turning point- iterative so use haversine
                 turned = false;
                 if (curLeg === task.coords.length - 1) { // If we are on the final leg
                     if (nextstatus.distance < prefs.sectors.finrad) {
@@ -120,6 +123,7 @@
                         bestSoFar = currentDistance;
                         tpindices[0] = startIndexLatest;
                         bestIndex = i;
+                        bestLeg=curLeg;
                     }
                 }
             }
@@ -128,6 +132,9 @@
         while (i < endIndex);
         if (bestSoFar === 0) { //allow for crossing start line then going backwards
             curLeg = 0;
+        }
+        if ((bestLeg===curLeg) && (curLeg < task.coords.length))  {      //ignore this if the best distance was at the last TP, don't bother if finished
+            bestSoFar= distanceToNext - utils.getTrackData(flight.latLong[bestIndex], task.coords[curLeg]).distance;  //recalculate using ellipsoid model
         }
         return {
             npoints: curLeg,

@@ -42,11 +42,7 @@ var doit;
           $('#about').click(function () {
           window.open("igcabout.html", "_blank");
         });
-          
-       $('#help').click(function () {
-          window.open("igchelp.html", "_blank");
-        });
-        
+                  
         $('#fileControl').change(function() {
             if (this.files.length > 0) {
                 var reader = new FileReader();
