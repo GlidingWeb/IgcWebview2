@@ -213,8 +213,8 @@ module.exports = {
     lambda1 = deltaLon + (1-C) * flattening* sinAlpha * (sigma + C*sinAlpha*(cos2M+C*cosSigma*(-1+2*cos2M*cos2M)));
     iteration++;
  }
-      while ((Math.abs(lambda2-lambda1)  > 1e-12) && (iteration < 20));
-    if (iteration > 19) {
+      while ((Math.abs(lambda2-lambda1)  > 1e-12) && (iteration < 100));
+    if (iteration > 99) {
         alert("Distance out of range: check coordinates");
     }
     var uSq = cossq* (EARTHRAD*EARTHRAD -MINRAD*MINRAD) / (MINRAD*MINRAD);
