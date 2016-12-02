@@ -102,10 +102,14 @@
 
     setAat: function(radii,aattime) {
         var i;
+        var prefs=require('./preferences');
         this.tasktype='aat';
         aatradii.length=0;
         for(i=0;i < radii.length; i++) {
             aatradii.push(radii[i]);
+        }
+        if(prefs.sectors.finishtype==='circle') {
+            aatradii.push(prefs.sectors.finrad);
         }
         this.aatRange=getAatRange();
         this.aatMins=aattime;

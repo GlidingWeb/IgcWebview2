@@ -152,17 +152,22 @@
             });
 
             var pinicon = {
-                url: 'Icons/pin.png',
-                anchor: new google.maps.Point(4, 48)
+                url: 'Icons/pushpin.png',
+                anchor: new google.maps.Point(4, 49)
             };
-
+   
+        var turnicon= {
+           url: 'Icons/blue-dot.png',
+           anchor: new google.maps.Point(4, 49)
+       };
+ 
             pin = new google.maps.Marker({
                 icon: pinicon,
                 clickable: false
             });
            return true;
         },
-
+     
         setBounds: function(bounds) {
             mapObj.fitBounds(bounds);
         },

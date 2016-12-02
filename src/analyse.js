@@ -23,8 +23,8 @@
                     break;
                 case task.coords.length: //finish line
                     heading = task.bearing[task.coords.length - 1];
-                    limits.max = heading + 90;
-                    limits.min = heading - 90;
+                    limits.max = heading - 90;
+                    limits.min = heading + 90;
                     break;
                 default:
                     if (sectordefs.use_sector)  {
@@ -94,7 +94,7 @@
                             turned = true;
                         }
                         else {
-                            if (checkSector(nextstatus.bearing, sectorLimits[curLeg])) {
+                            if (checkSector(nextstatus.bearing,sectorLimits[curLeg])) {
                                 turned = true;
                             }
                         }
@@ -143,78 +143,182 @@
             bestPoint: bestIndex
         };
     }
+    
+function checkAatSector(index,sector) {
+    var limits={};
+    var heading;
+    var sectorStatus;  
+    var retval;
+     switch(sector) {
+        case 0:
+        heading = task.bearing[1];
+         limits.max = (heading  + 270)%360;
+        limits.min = (heading + 90)%360;
+        sectorStatus = utils.toPoint(task.coords[0], flight.latLong[index]);
+        retval=(checkSector(sectorStatus.bearing, limits)) && (sectorStatus.distance < prefs.sectors.startrad);
+        break;
+        case task.coords.length-1:
+         retval=(utils.toPoint(task.coords[sector],flight.latLong[index]).distance  < prefs.sectors.finrad);  
+         break;
+        default:
+        retval=(utils.toPoint(task.coords[sector],flight.latLong[index]).distance  < task.aatradii[sector-1]);
+    }
+    return retval;
+}
 
-function assessAat(startIndex, endIndex, sectorLimits) {
-        var i = startIndex;
-        var curLeg = -1;
-        var startstatus;
-        var distanceToNext;
-        var bestIndex;
-        var currentDistance;
-        var bestThisLeg=0;
-        var nextstatus;
-        var zoneStatus;
-        var refPoint;
-        var legDistance=[];
-        var turnIndex=[];
-        var bestIndex;
+ function getAatDistance(startIndex,endPoint,endRadius,timeOut,endIndex) {
+       var startPoint= flight.latLong[startIndex];
+      var maxDistance=0;
+      var maxIndex=startIndex;
+      var currentDistance;
+      var i=startIndex;
+      var nextPointDistance;
+      var status= 'landout';
+      var intersector = {
+          lat: 0,
+          lng: 0
+      };
+         do  {
+          nextPointDistance=utils.toPoint(flight.latLong[i],endPoint).distance;
+          intersector.lat= endRadius*(flight.latLong[i].lat - endPoint.lat)/nextPointDistance + endPoint.lat;
+          intersector.lng= endRadius*(flight.latLong[i].lng - endPoint.lng)/nextPointDistance + endPoint.lng;
+          currentDistance=utils.toPoint(startPoint,intersector).distance - nextPointDistance + endRadius;
+          if(Number(currentDistance)  > Number(maxDistance)) {
+              maxDistance = currentDistance;
+              maxIndex=i;
+          }
+          if(flight.recordTime[i] >= timeOut) {
+            status='timeout';
+          }
+          i++;
+      }
+      while ((i < endIndex) && (status !=='timeout'));
+      //recalculate Vincenty
+      nextPointDistance=utils.getTrackData(flight.latLong[maxIndex],endPoint).distance;
+       intersector.lat= endRadius*(flight.latLong[maxIndex].lat - endPoint.lat)/nextPointDistance + endPoint.lat;
+       intersector.lng= endRadius*(flight.latLong[maxIndex].lng - endPoint.lng)/nextPointDistance + endPoint.lng;
+       maxDistance=utils.getTrackData(startPoint,intersector).distance - nextPointDistance + endRadius;
+      return  {
+                   distance: maxDistance,
+                    status: status,
+                     bestIndex: maxIndex
+      };
+ }
+
+  function assessAat(startIndex, endIndex, sectorLimits) {
+        var i= startIndex;
+        var j;
+        //var sectorsRecorded=[];
+        var maxSector=-1;
+        var prevSector=-1;
+        var curSector;
+        var startStatus=false;
+        //var startIndex;
+        var checkLast;
+        var bestLocation=[];
+         var legBest=[];
+         var currentDistance;
+         var bestIndex=[];
+         var finishStatus=false;
+         var distance=0;
+         var bestPoint;
+         var bestSoFar;
+         var timeOutValue;
+         var nonFinish;
         
+        for(j=0; j < task.coords.length;j++) {
+            legBest[j]=0;
+        }
         do {
-        if (curLeg < 2) { //not reached first TP
-                startstatus = utils.toPoint(task.coords[0], flight.latLong[i]); //check if in start zone
-                if ((checkSector(startstatus.bearing, sectorLimits[0])) && (startstatus.distance < prefs.sectors.startrad)) {
-                    curLeg = 0; // we are  in the start zone
+                if(checkAatSector(i,0)) {
+                    curSector=0;
                 }
                 else {
-                    if (curLeg === 0) { //if we were in the start zone and now aren't
-                        curLeg = 1; //we're now on the first leg
-                        startIndexLatest = i; //and this is our latest recorded start;
-                        refPoint=task.coords[0];
-                        zoneStatus=0;
-                        legDistance[1]=0;
-                    }
+                    (curSector=-1);
+                }
+                if ((prevSector===0) && (curSector===-1)) {
+                    startStatus=true;
+                }          
+                prevSector=curSector;
+          i++;  
+        }
+        while (( i < endIndex) && startStatus===false);
+        bestIndex[0]=i-1;
+        maxSector=0;
+        bestLocation[0]=task.coords[0];
+        do {
+            checkLast=checkAatSector(i,maxSector);
+            if(checkLast) {
+                curSector=maxSector;
+            }
+            else {
+                if(checkAatSector(i,maxSector+1)) {
+                    maxSector++;
+                    curSector=maxSector;
+                }
+                else {
+                    curSector=-1;
                 }
             }
-    if ((curLeg > 0) && (curLeg < task.coords.length)) { // if started
-        nextstatus = utils.toPoint(flight.latLong[i], task.coords[curLeg]); //distance and bearing to  next turning point
-        if(nextstatus.distance < task.aatradii[curLeg-1]) {  //if in tpzone
-            zoneStatus=curLeg;
-            currentDistance=utils.toPoint(flight.latLong[i],refPoint).distance;
+            if((prevSector===0) && (curSector===-1)) {  // this is a restart
+                bestIndex[0]=i;
+            }
+            if(curSector===task.coords.length-1) {  //finished
+                finishStatus=true;
+                bestIndex[task.coords.length-1]=i;
+                bestLocation[task.coords.length-1]=task.coords[task.coords.length-1];
+                bestPoint=i;
+            }
+            else{
+            if(curSector >0) {
+                currentDistance=utils.toPoint(flight.latLong[i],bestLocation[curSector-1]).distance + utils.toPoint(flight.latLong[i],task.coords[curSector+1]).distance;
+                if(currentDistance > legBest[curSector]) {
+                    legBest[curSector]=currentDistance;
+                    bestIndex[curSector]=i;
+                    bestLocation[curSector]=flight.latLong[i]
+                }
+            } 
+            }
+            prevSector=curSector;
+            i++;
+        }
+    while((i < endIndex) && (finishStatus===false));
+    if(finishStatus) {
+        for(j=0;j < maxSector; j++) {
+           distance+=utils.getTrackData(bestLocation[j],bestLocation[j+1]).distance;
+       }
+       if(prefs.sectors.finishtype==='circle') {
+           distance-=prefs.sectors.finrad;
+       }
+        status='finished';
         }
         else {
-            if(zoneStatus > 0) { // coming out of zone
-                turnIndex[curLeg]=bestIndex;
-                curLeg++;
-                console.log("At exit " + bestIndex);
-                legDistance[curLeg]=0;
-                currentDistance=0;
+            timeOutValue= flight.recordTime[bestIndex[0]] + 60*task.aatMins;
+            j=0;
+            while ((j < maxSector) && (flight.recordTime[bestIndex[j]] < timeOutValue))
+              {
+             distance+=utils.getTrackData(bestLocation[j],bestLocation[j+1]).distance;
+                j++;
             }
-            zoneStatus=0;
-            currentDistance= task.legsize[curLeg]-nextstatus.distance;
+            nonFinish=getAatDistance(bestIndex[j],task.coords[j + 1],task.aatradii[j],timeOutValue,endIndex);
+            status=nonFinish.status
+            distance = parseFloat(distance) + parseFloat(nonFinish.distance);
+            bestPoint=nonFinish.bestIndex;
         }
-         if(currentDistance > legDistance[curLeg]) {
-                legDistance[curLeg]=currentDistance;
-                bestIndex=i;
-            }
-        if ((i>1270) && (i < 1275)) {
-           console.log("Index: " +i);
-           console.log("Zone: " + zoneStatus);
-           console.log("Leg distance " + legDistance[curLeg]);
-           console.log("Current distance  " + currentDistance);
-           console.log("best index " +turnIndex[1]);
-       }
-       }
-                i++;
-            }
-             while (i < endIndex);
-}
+        return {
+            status: status,
+            turnIndices: bestIndex,
+            scoreDistance: distance,
+            bestPoint: bestPoint
+        };
+  }
     
 function assessSection(startIndex, endIndex, sectorLimits) {
     if(task.tasktype==='trad') {
         return assessTrad(startIndex, endIndex, sectorLimits);
 }
 else {
-     return assessAat(startIndex, endIndex, sectorLimits);
+       return assessAat(startIndex, endIndex, sectorLimits);
 }
       }
     
@@ -223,7 +327,6 @@ else {
             var assessment;
             var tempAssess;
             var bestLength = 0;
-            
             var i;
             var sectorLimits= getSectorLimits(task, prefs.sectors);
             if ((prefs.enlPrefs.detect === 'Off') || (flight.engineRunList.length === 0)) {
