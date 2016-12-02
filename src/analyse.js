@@ -23,8 +23,8 @@
                     break;
                 case task.coords.length: //finish line
                     heading = task.bearing[task.coords.length - 1];
-                    limits.max = heading + 90;
-                    limits.min = heading - 90;
+                    limits.max = heading - 90;
+                    limits.min = heading + 90;
                     break;
                 default:
                     if (sectordefs.use_sector) {
