@@ -1,6 +1,6 @@
 //Contains general purpose calculations- not necessarily exclusive to this application
 var EARTHRAD = 6378.137; //  Earth radius major axis km
-var MINRAD= 6356.172;        //earth radius minor axis
+var MINRAD= 6356.752;        //earth radius minor axis
 var semaphore;
 var startElevation;
 
