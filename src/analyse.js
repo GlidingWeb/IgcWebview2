@@ -140,7 +140,7 @@
             npoints: curLeg,
             turnIndices: tpindices,
             scoreDistance: bestSoFar,
-            bestPoint: bestIndex
+            bestPoint: bestIndex,
         };
     }
     
@@ -225,6 +225,7 @@ function checkAatSector(index,sector) {
          var bestSoFar;
          var timeOutValue;
          var nonFinish;
+         var status=null;
         
         for(j=0; j < task.coords.length;j++) {
             legBest[j]=0;
@@ -309,7 +310,8 @@ function checkAatSector(index,sector) {
             status: status,
             turnIndices: bestIndex,
             scoreDistance: distance,
-            bestPoint: bestPoint
+            bestPoint: bestPoint,
+            npoints: bestIndex.length
         };
   }
     

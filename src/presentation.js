@@ -8,6 +8,36 @@
     var barogram = require('./plotgraph');
     var task = require('./task.js');
     var planWindow;
+    
+    var measureTool={
+        status: 'empty',
+        start: null,
+        end: null
+    };
+   
+    function measureClick(lat,lng) {
+        var coords= {
+            lat: lat,
+            lng: lng
+        };
+        var calc;
+      switch (measureTool.status) {
+          case 'empty':
+        mapControl.showStart(coords);
+        $('#measure1').html("Start: " + utils.showFormat(coords));
+         $('#measure2').text("Click on finish point");
+         measureTool.status='started';
+         measureTool.start=coords;
+        break;
+          case 'started':
+            mapControl.showFinish(coords);
+            measureTool.end=coords;
+            calc=utils.getTrackData(measureTool.start,measureTool.end);
+            $('#measure2').html("Finish: " + utils.showFormat(coords));
+            $('#measure3').html("Distance: " + prefs.showDistance(calc.distance) + "<br/>Initial bearing: " + calc.bearing + "&deg;");
+            break;
+      }
+    }
 
     function zapTask() {
         $('#taskentry').hide();
@@ -151,6 +181,11 @@ function waitForMap(interval,counter) {
        var altValue;
        var taskreport='';
        var elapsedTime;
+       var i;
+       for(i=1; i < taskData.turnIndices.length; i++) {
+           mapControl.addBlueMarker(flight.latLong[taskData.turnIndices[i]]);
+       }
+       mapControl.addBlueMarker(taskData.turnIndices);
        elapsedTime=flight.recordTime[taskData.bestPoint] - flight.recordTime[taskData.turnIndices[0]];
         taskreport+="<br/>Start: " + showLocalTime(taskData.turnIndices[0]) + ": Altitude: ";
         altValue = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[0]], flight.gpsAltitude[taskData.turnIndices[0]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
@@ -179,7 +214,6 @@ function waitForMap(interval,counter) {
     }
     
     module.exports = {
-
         setSectors: function() {
             var sectors = {
                 startrad: $('#startrad').val(),
@@ -621,6 +655,25 @@ function waitForMap(interval,counter) {
               task.setSectorType('trad');
         }
         },
+ 
+         resetMeasure: function() {
+             $('#measurer p').text('');
+             $('#measure1').text("Click on start point");
+             measureTool.status='empty';
+            measureTool.start=null;
+            measureTool.finish=null;
+            mapControl.clearMeasureFlags();
+         },
+ 
+        measure: function() {
+            this.resetMeasure();
+            $('#measurer').show();
+            mapControl.activate(measureClick);
+        },
+
+       zapMeasure: function() {
+           mapControl.unclick();
+       },
  
         reportHeightInfo: function(index) {
             var elevation;

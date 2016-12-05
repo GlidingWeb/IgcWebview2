@@ -249,6 +249,18 @@ window.onresize = function(){
              $('#zoomlabel').hide();
          });
 
+          $('#measure').click(function() {
+              present.measure();
+         });
+         
+    $('#measurer :button').click(function () {
+        present.resetMeasure();
+});
+        
+    $('#closemeasure').click(function() {
+        present.zapMeasure();
+    });
+    
         $('button.toggle').click(
           function () {
             $(this).next().toggle();

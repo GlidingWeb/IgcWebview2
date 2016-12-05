@@ -4,6 +4,7 @@
     var mapObj = {};
     var trackline;
     var gliderMarker;
+    var blueIcon;
     var taskfeatures = [];
     var sectorfeatures = [];
     var airspace = {
@@ -13,7 +14,16 @@
         circle_bases: []
     };
     var engineLines = [];
-
+    var blueMarkers= [];
+    var pin;
+    var finishFlag;
+    var startFlag;
+    
+    function putMarker(marker,coords) {
+        marker.setPosition(coords);
+        marker.setMap(mapObj);
+    }
+    
     function deleteEnl() {
         var i;
         for (i = 0; i < engineLines.length; i++) {
@@ -140,10 +150,11 @@
             var mapOpt = {
                 mapTypeId: google.maps.MapTypeId.TERRAIN,
                 streetViewControl: false,
-                styles: myStyles
+                styles: myStyles,
             };
 
             mapObj = new google.maps.Map($('#map').get(0), mapOpt);
+            
             gliderMarker = new google.maps.Marker({
                 icon: 'Icons/glidericon.png',
                 clickable: false,
@@ -152,22 +163,43 @@
             });
 
             var pinicon = {
-                url: 'Icons/pushpin.png',
+                url: 'Icons/pin.png',
                 anchor: new google.maps.Point(4, 49)
             };
-   
-        var turnicon= {
+            
+            var finishIcon = {
+                url: 'Icons/finish.png',
+                anchor: new google.maps.Point(0, 30)
+            };
+    
+             var startIcon = {
+                url: 'Icons/start.png',
+                anchor: new google.maps.Point(5, 30)
+            };
+            
+        blueIcon= {
            url: 'Icons/blue-dot.png',
-           anchor: new google.maps.Point(4, 49)
+           anchor: new google.maps.Point(16, 32),
        };
- 
-            pin = new google.maps.Marker({
+            
+        pin = new google.maps.Marker({
                 icon: pinicon,
                 clickable: false
             });
+        
+        finishFlag= new google.maps.Marker({
+                icon: finishIcon,
+                clickable: false
+            });
+        
+        startFlag= new google.maps.Marker({
+                icon: startIcon,
+                clickable: false
+            });
+        
            return true;
         },
-     
+
         setBounds: function(bounds) {
             mapObj.fitBounds(bounds);
         },
@@ -301,7 +333,19 @@
                 engineLines[i].setMap(mapObj);
             }
         },
-
+         
+         addBlueMarker: function(coords) {
+                 taskmarker = new google.maps.Marker({
+                    icon:blueIcon,
+                    position: coords,
+                    map: mapObj,
+                    clickable: false,
+                    zIndex: 50
+                });
+              taskmarker.setMap(mapObj);
+              blueMarkers.push(taskmarker);
+         },
+ 
         addTask: function(tplist, zoomto) {
             var j;
             this.zapTask();
@@ -335,10 +379,9 @@
             mapObj.panTo(tpoint);
             mapObj.setZoom(13);
         },
-
+ 
         pushPin: function(coords) {
-            pin.setPosition(coords);
-            pin.setMap(mapObj);
+            putMarker(pin,coords);
         },
 
         resizeMap: function() {
@@ -348,6 +391,31 @@
          clearPin: function() {
              pin.setMap(null);
          },
+   
+       clearMeasureFlags: function() {
+           startFlag.setMap(null);
+           finishFlag.setMap(null);
+       }, 
+ 
+        showFinish: function(coords) {
+             putMarker(finishFlag,coords);
+        },
+ 
+        showStart: function(coords) {
+             putMarker(startFlag,coords);
+        },
+ 
+        activate: function(param) {
+            mapObj.setOptions({draggableCursor:'pointer'});
+            mapObj.addListener('click', function(e) {
+             param(e.latLng.lat(),e.latLng.lng());
+             });
+        },
+ 
+        unclick: function() {
+            google.maps.event.clearListeners(mapObj, 'click');
+            mapObj.setOptions({draggableCursor:'hand'});
+        },
  
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);
