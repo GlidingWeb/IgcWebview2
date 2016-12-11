@@ -17,23 +17,23 @@
         mapControl.zapTask();
     }
 
-function waitForMap(interval,counter) {
-    if (haveMap){
-        return;
-    }
-    else{
+    function waitForMap(interval, counter) {
+        if (window.haveMap) {
+            return;
+        }
+        else {
             counter++;
-            if(counter > 10) {
+            if (counter > 10) {
                 alert("Map Load Failed");
                 return;
             }
-        else {
-             setTimeout(function(){
-            waitForMap(interval,counter);
-            });
+            else {
+                setTimeout(function() {
+                    waitForMap(interval, counter);
+                });
+            }
+        }
     }
-}
-}
 
     function enterTask(points, zoomto) {
         task.createTask(points);
@@ -64,7 +64,7 @@ function waitForMap(interval,counter) {
         $('#taskbuttons button').on('click', function(event) {
             var li = $(this).index();
             mapControl.showTP(task.coords[li]);
-            $('#zoomdiv').css('zIndex',1);
+            $('#zoomdiv').css('zIndex', 1);
         });
     }
 
@@ -78,7 +78,7 @@ function waitForMap(interval,counter) {
         headerBlock.html('');
         //force word-wrap after commas by inserting zero-width space- relevant to small screens
         for (headerIndex = 0; headerIndex < headerList.length; headerIndex++) {
-            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value.replace(',',',&#8203;') + "</td></tr>");
+            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value.replace(',', ',&#8203;') + "</td></tr>");
         }
     }
 
@@ -105,7 +105,7 @@ function waitForMap(interval,counter) {
             };
             var saveit = $('#savesectors').prop('checked');
             if (prefs.setSectors(sectors, saveit)) {
-                if(task) {
+                if (task) {
                     task.setLength();
                     $('#tasklength').text("Task distance: " + prefs.showDistance(task.getTaskLength()));
                 }
@@ -176,7 +176,7 @@ function waitForMap(interval,counter) {
                 $("input[name=enldetect][value='Off']").prop("checked", true);
             }
             $('#enlthreshold').val(enlObj.threshold),
-                $('#enltime').val(enlObj.duration)
+                $('#enltime').val(enlObj.duration);
         },
 
         showPreferences: function() {
@@ -358,7 +358,7 @@ function waitForMap(interval,counter) {
             else {
                 $('#P').attr('disabled', false);
             }
-            waitForMap(10,0);        //Map load is asyncronous- need to check it's available
+            waitForMap(10, 0); //Map load is asyncronous- need to check it's available
             $('#righthalf').css('visibility', 'visible');
             $('#infobox').css('visibility', 'visible');
             var tzBack = this.getGeoInfo.bind(this);
@@ -386,7 +386,7 @@ function waitForMap(interval,counter) {
                     zapTask();
                 }
             }
-             document.getElementById('map').scrollIntoView();
+            document.getElementById('map').scrollIntoView();
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
         },
@@ -395,7 +395,7 @@ function waitForMap(interval,counter) {
             if (flight) {
                 mapControl.setBounds(flight.bounds);
             }
-             $('#zoomdiv').css('zIndex',1);
+            $('#zoomdiv').css('zIndex', 1);
         },
 
         showAltPreferences: function() {
@@ -414,11 +414,12 @@ function waitForMap(interval,counter) {
             var altValue = [];
             var altLoss;
             var taskEndIndex;
-            
+            var taskData;
+            var analyse = require('./analyse');
+
             $('#taskcalcs').html("Take off:  " + showLocalTime(takeOffIndex) + "<br>");
             if (task.coords.length > 1) {
-                var analyse = require('./analyse');
-                var taskData = analyse.assessTask();
+                taskData = analyse.assessTask();
                 var i;
                 for (i = 0; i < task.coords.length; i++) {
                     $('#taskcalcs').append("<br/>" + task.labels[i] + ": ");
@@ -434,7 +435,7 @@ function waitForMap(interval,counter) {
                 if (taskData.npoints === task.coords.length) { //task completed
                     mapControl.clearPin();
                     $('#taskcalcs').append("<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed");
-                    taskEndIndex=taskData.turnIndices[taskData.npoints - 1];
+                    taskEndIndex = taskData.turnIndices[taskData.npoints - 1];
                     var elapsedTime = flight.recordTime[taskEndIndex] - flight.recordTime[taskData.turnIndices[0]];
                     $('#taskcalcs').append("<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime));
                     $('#taskcalcs').append("<br/>Speed: " + prefs.showTaskSpeed(3600 * task.getTaskLength() / elapsedTime));
@@ -452,8 +453,8 @@ function waitForMap(interval,counter) {
                 }
                 else { // GPS landout
                     if (taskData.npoints > 0) {
-                        taskEndIndex=taskData.bestPoint;
-                         $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
+                        taskEndIndex = taskData.bestPoint;
+                        $('#taskcalcs').append("<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint));
                         $('#taskcalcs').append("<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]));
                         $('#taskcalcs').append("<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance));
                         mapControl.pushPin(flight.latLong[taskData.bestPoint]);
@@ -463,14 +464,16 @@ function waitForMap(interval,counter) {
             $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
             var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
             $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
-            if(taskData.npoints > 0) {
-                 var thermalInfo=analyse.getThermalCount(taskData.turnIndices[0],taskEndIndex);
+            if (taskData.npoints > 0) {
+                var thermalInfo = analyse.getThermalCount(taskData.turnIndices[0], taskEndIndex);
                 $('#taskcalcs').append("<br/><br/><b>On Task: </b>");
-                 $('#taskcalcs').append("<br/>Time  circling: " + Math.floor(thermalInfo.circleTime/60) + " mins " + thermalInfo.circleTime%60 + " secs");
-                 var altInfo=prefs.displayAlt(thermalInfo.heightGain);
-                 $('#taskcalcs').append("<br/>Height gained: " + altInfo.showval + " " + altInfo.descriptor);
-                  $('#taskcalcs').append("<br/>Average climb: " + prefs.showClimb(thermalInfo.heightGain/thermalInfo.circleTime));
-                  $('#taskcalcs').append("<br/><br/>Task wind: " + prefs.showCruise(thermalInfo.windSpeed) + " from " + Math.round(thermalInfo.windDirection) + "&deg;");
+                $('#taskcalcs').append("<br/>Time  circling: " + Math.floor(thermalInfo.circleTime / 60) + " mins " + thermalInfo.circleTime % 60 + " secs");
+                var altInfo = prefs.displayAlt(thermalInfo.heightGain);
+                $('#taskcalcs').append("<br/>Height gained: " + altInfo.showval + " " + altInfo.descriptor);
+                if (thermalInfo.circleTime > 0) {
+                    $('#taskcalcs').append("<br/>Average climb: " + prefs.showClimb(thermalInfo.heightGain / thermalInfo.circleTime));
+                }
+                $('#taskcalcs').append("<br/><br/>Task wind: " + prefs.showCruise(thermalInfo.windSpeed) + " from " + Math.round(thermalInfo.windDirection) + "&deg;");
             }
         },
 
@@ -512,7 +515,6 @@ function waitForMap(interval,counter) {
         },
 
         reportHeightInfo: function(index) {
-            var elevation;
             var qnhMetric;
             var qnh;
             if (flight.baseElevation !== null) {

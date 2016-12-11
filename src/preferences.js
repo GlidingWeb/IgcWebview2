@@ -35,6 +35,17 @@
         distance: 'km'
     };
 
+    var sectors = {
+        startrad :5,
+        finrad : 1,
+        tprad : 0.5,
+        sector_rad:  20,
+        sector_angle:  90,
+        use_sector:  true,
+        use_barrel:  true,
+        finishtype:  "line"
+    };
+
     function enlRealityCheck(enl) {
         var configerror = "";
         if (enl.detect === 'On') {
@@ -91,13 +102,6 @@
                 // If permission is denied, ignore the error.
             }
         }
-    }
-
-    function setConverter(unitObj, descriptor, multiplier, precision, abbr) {
-        unitObj.descriptor = descriptor;
-        unitObj.multiplier = multiplier;
-        unitObj.precision = precision;
-        unitObj.abbr = abbr;
     }
 
     module.exports = {
@@ -293,7 +297,6 @@
         showAltitude: function(pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
             var takeoff;
             var source;
-            var multiplier;
             var metreval;
             if (this.altPrefs.altsource === 'P') {
                 metreval = pressureAlt;

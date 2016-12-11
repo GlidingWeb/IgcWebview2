@@ -41,9 +41,6 @@
         var utils = require('./utilities');
         var interval = Math.ceil(15 / recordInterval); //getting 15 second average turn rate
         var j;
-        var i = j - interval;
-        var alt;
-        var snapTurn;
         var turnList = []; //rolling list of last 30 seconds worth of turn changes
         var cuSum = 0;
         var prevBearing = utils.toPoint(latLong[0], latLong[1]).bearing;
@@ -114,10 +111,6 @@
             function getTaskPoints(declaration) {
                 if (declaration.length > 4) {
                     var i;
-                    var taskdata = {
-                        coords: [],
-                        names: []
-                    };
                     for (i = 1; i < declaration.length - 1; i++) {
                         if ((declaration[i].substring(1, 8) + declaration[i].substring(9, 17)) !== '000000000000000') { //Allow for loggers with empty C records (eg. EW)
                             taskpoints.coords.push(utils.parseLatLong(declaration[i].substring(1, 18)));
@@ -241,6 +234,7 @@
             var lRecords = [];
             var firstFix = 0;
             var taskMatch;
+            var noiseLevel;
             hasPressure = false;
             var positionRegex = /^B([\d]{6})([\d]{7}[NS][\d]{8}[EW])([AV])([-\d][\d]{4})([-\d][\d]{4})/;
             var taskRegex = /^\S*(C[\d]{7}[NS][\d]{8}[EW].*)/;
@@ -289,9 +283,9 @@
                         }
                         break;
                     case 'L':
-                        taskMatch=taskRegex.exec(currentLine);
-                       if(taskMatch) {
-                          lRecords.push(taskMatch[1]);
+                        taskMatch = taskRegex.exec(currentLine);
+                        if (taskMatch) {
+                            lRecords.push(taskMatch[1]);
                         }
                         break;
                     case 'B': // Position fix
@@ -387,7 +381,7 @@
             landingIndex = j;
 
             unixStart.push(utils.getUnixDate(dateRecord) + recordTime[0]); //This is the only place we use Javascript Date object, easiest way of getting the day of week
-            if(lRecords.length > 0) {
+            if (lRecords.length > 0) {
                 getTaskPoints(lRecords);
             }
             else {

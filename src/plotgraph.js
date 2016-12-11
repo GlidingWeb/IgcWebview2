@@ -22,6 +22,7 @@
             var enlLabel;
             var enlThreshold;
             var spotAlt;
+            var yaxisLabel;
             var altMin = 0;
 
             var startTime = 1000 * (flight.recordTime[0] + flight.timeZone.offset);

@@ -13,6 +13,7 @@
         circle_bases: []
     };
     var engineLines = [];
+    var pin;
 
     function deleteEnl() {
         var i;
@@ -156,11 +157,11 @@
                 anchor: new google.maps.Point(4, 48)
             };
 
-            pin = new google.maps.Marker({
+           pin = new google.maps.Marker({
                 icon: pinicon,
                 clickable: false
             });
-           return true;
+            return true;
         },
 
         setBounds: function(bounds) {
@@ -236,6 +237,7 @@
             var circle;
             var line;
             var sector;
+            var finish;
             zapSectors();
             var task = require('./task');
             if (task.names.length > 0) {
@@ -331,13 +333,13 @@
         },
 
         resizeMap: function() {
-            google.maps.event.trigger(mapObj,'resize');
+            google.maps.event.trigger(mapObj, 'resize');
         },
-        
-         clearPin: function() {
-             pin.setMap(null);
-         },
- 
+
+        clearPin: function() {
+            pin.setMap(null);
+        },
+
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);
             var gliderpos = new google.maps.LatLng(position);

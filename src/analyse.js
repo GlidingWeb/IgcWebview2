@@ -67,15 +67,16 @@
         var bestSoFar = 0;
         var bestIndex;
         var bestLeg;
+        var currentDistance;
         var tpindices = [];
-        
+
         do {
             if (curLeg < 2) { //not reached first TP
                 startstatus = utils.toPoint(task.coords[0], flight.latLong[i]); //check if in start zone
                 if ((checkSector(startstatus.bearing, sectorLimits[0])) && (startstatus.distance < prefs.sectors.startrad)) {
                     curLeg = 0; // we are  in the start zone
                     startIndexLatest = i;
-                    distanceToNext=0;
+                    distanceToNext = 0;
                 }
                 else {
                     if (curLeg === 0) { //if we were in the start zone and now aren't
@@ -123,7 +124,7 @@
                         bestSoFar = currentDistance;
                         tpindices[0] = startIndexLatest;
                         bestIndex = i;
-                        bestLeg=curLeg;
+                        bestLeg = curLeg;
                     }
                 }
             }
@@ -133,8 +134,8 @@
         if (bestSoFar === 0) { //allow for crossing start line then going backwards
             curLeg = 0;
         }
-        if ((bestLeg===curLeg) && (curLeg < task.coords.length))  {      //ignore this if the best distance was at the last TP, don't bother if finished
-            bestSoFar= distanceToNext - utils.getTrackData(flight.latLong[bestIndex], task.coords[curLeg]).distance;  //recalculate using ellipsoid model
+        if ((bestLeg === curLeg) && (curLeg < task.coords.length)) { //ignore this if the best distance was at the last TP, don't bother if finished
+            bestSoFar = distanceToNext - utils.getTrackData(flight.latLong[bestIndex], task.coords[curLeg]).distance; //recalculate using ellipsoid model
         }
         return {
             npoints: curLeg,
@@ -167,8 +168,6 @@
         },
 
         getThermalCount: function(startIndex, endIndex) {
-            var thermalStart = startIndex;
-            var thermalEnd = 0;
             var i = startIndex;
             var thermalData;
             var circleTime = 0;
@@ -215,7 +214,6 @@
                 var EARTHRAD = utils.getEarthSize();
                 var x = (flight.latLong[index + 1].lng - flight.latLong[index].lng) * Math.cos(Math.PI * (flight.latLong[index + 1].lat + flight.latLong[index].lat) / 360);
                 var y = (flight.latLong[index + 1].lat - flight.latLong[index].lat);
-                var interval = flight.recordTime[index + 1] - flight.recordTime[index];
                 var vectorY = 1000 * y * Math.PI * EARTHRAD / 180 / (flight.recordTime[index + 1] - flight.recordTime[index]);
                 var vectorX = 1000 * x * Math.PI * EARTHRAD / 180 / (flight.recordTime[index + 1] - flight.recordTime[index]);
                 return {
@@ -254,5 +252,5 @@
                 direction: circleData.direction
             };
         }
-    }
-}())
+    };
+}());
