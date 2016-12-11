@@ -8,63 +8,65 @@
     var barogram = require('./plotgraph');
     var task = require('./task.js');
     var planWindow;
-    
-    var measureTool={
+
+    var measureTool = {
         status: 'empty',
         start: null,
         end: null
     };
-   
-    function measureClick(lat,lng) {
-        var coords= {
+
+    function measureClick(lat, lng) {
+        var coords = {
             lat: lat,
             lng: lng
         };
         var calc;
-      switch (measureTool.status) {
-          case 'empty':
-        mapControl.showStart(coords);
-        $('#measure1').html("Start: " + utils.showFormat(coords));
-         $('#measure2').text("Click on finish point");
-         measureTool.status='started';
-         measureTool.start=coords;
-        break;
-          case 'started':
-            mapControl.showFinish(coords);
-            measureTool.end=coords;
-            calc=utils.getTrackData(measureTool.start,measureTool.end);
-            $('#measure2').html("Finish: " + utils.showFormat(coords));
-            $('#measure3').html("Distance: " + prefs.showDistance(calc.distance) + "<br/>Initial bearing: " + calc.bearing + "&deg;");
-            break;
-      }
+        switch (measureTool.status) {
+            case 'empty':
+                mapControl.showStart(coords);
+                $('#measure1').html("Start: " + utils.showFormat(coords));
+                $('#measure2').text("Click on finish point");
+                measureTool.status = 'started';
+                measureTool.start = coords;
+                break;
+            case 'started':
+                mapControl.showFinish(coords);
+                measureTool.end = coords;
+                calc = utils.getTrackData(measureTool.start, measureTool.end);
+                $('#measure2').html("Finish: " + utils.showFormat(coords));
+                $('#measure3').html("Distance: " + prefs.showDistance(calc.distance) + "<br/>Initial bearing: " + calc.bearing + "&deg;");
+                break;
+        }
     }
 
     function zapTask() {
         $('#taskentry').hide();
         $('#task').hide();
         $('#taskbuttons').html('');
-        $('#trad').prop('checked',true);
+        $('#trad').prop('checked', true);
         task.clearTask();
         mapControl.zapTask();
     }
 
-function waitForMap(interval,counter) {
-    if (haveMap){
-        return;
-    }
-    else{
+    function waitForMap(interval, counter) {
+        if (haveMap) {
+            return;
+        }
+        else {
             counter++;
-            if(counter > 10) {
+            if (counter > 10) {
                 alert("Map Load Failed");
                 return;
             }
-        else {
-             setTimeout(function(){
-            waitForMap(interval,counter);
-            });
+            else {
+                setTimeout(function() {
+                    waitForMap(interval, counter);
+                });
+            }
+        }
     }
-}
-}
+
+
 
     function enterTask(points, zoomto) {
         task.createTask(points);
@@ -74,7 +76,7 @@ function waitForMap(interval,counter) {
         $('#taskbuttons').html("");
         $('#taskinfo').html("");
         for (i = 0; i < task.labels.length; i++) {
-            $('#taskinfo').append('<tr><th>' + task.labels[i] + ':</th><td>' + task.names[i] + ':</td><td>' + utils.showFormat(task.coords[i]) + '</td></tr>');
+            $('#taskinfo').append('<tr><th>' + task.labels[i] + ':</th><td>' + task.names[i] + ':</td><td>' + utils.showFormat(task.coords[i]) + '</td><td></td></tr>');
             switch (i) {
                 case 0:
                     pointlabel = "Start";
@@ -95,7 +97,7 @@ function waitForMap(interval,counter) {
         $('#taskbuttons button').on('click', function(event) {
             var li = $(this).index();
             mapControl.showTP(task.coords[li]);
-            $('#zoomdiv').css('zIndex',1);
+            $('#zoomdiv').css('zIndex', 1);
         });
     }
 
@@ -109,7 +111,7 @@ function waitForMap(interval,counter) {
         headerBlock.html('');
         //force word-wrap after commas by inserting zero-width space- relevant to small screens
         for (headerIndex = 0; headerIndex < headerList.length; headerIndex++) {
-            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value.replace(',',',&#8203;') + "</td></tr>");
+            headerBlock.append('<tr><th>' + headerList[headerIndex].name + ":  </th><td>" + headerList[headerIndex].value.replace(',', ',&#8203;') + "</td></tr>");
         }
     }
 
@@ -120,99 +122,103 @@ function waitForMap(interval,counter) {
         }
         planWindow.focus();
     }
-    
+
     function addAatInfo() {
         var i;
-        for(i=0;i < task.aatradii.length;i++) {
+        var ptr;
+        for (i = 0; i < task.aatradii.length; i++) {
+            ptr = $('#taskinfo').find('tr').eq(i + 1);
+            ptr.find("td:last").html(task.aatradii[i] + "Km circle");
+            /*
             $('#taskinfo').find('tr').eq(i+1).append("<td>" + task.aatradii[i] + "Km circle</td>");
+           */
         }
-        $('#tasklength').html("<b>Task size:</b> " + task.aatRange + "&emsp;<b>Time: </b>" + Math.floor(task.aatMins/60) + "hrs " +  task.aatMins%60 + "mins");
-    }
-   
-    
-    function  showTradPerformance(taskData) {
-        var i;
-       var altValue = [];
-       var taskEndIndex;
-        var altLoss;
-        var taskreport='';
-                for (i = 0; i < task.coords.length; i++) {
-                    taskreport+="<br/>" + task.labels[i] + ": ";
-                    if (i < taskData.npoints) {
-                        taskreport +=showLocalTime(taskData.turnIndices[i]) + ": Altitude: ";
-                        altValue[i] = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[i]], flight.gpsAltitude[taskData.turnIndices[i]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
-                        taskreport += altValue[i].altPos + altValue[i].descriptor;
-                    }
-                    else {
-                        taskreport+="No control";
-                    }
-                }
-                if (taskData.npoints === task.coords.length) { //task completed
-                    taskreport +="<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed";
-                    taskEndIndex=taskData.turnIndices[taskData.npoints - 1];
-                    var elapsedTime = flight.recordTime[taskEndIndex] - flight.recordTime[taskData.turnIndices[0]];
-                    taskreport +="<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime);
-                    taskreport +="<br/>Speed: " + prefs.showTaskSpeed(3600 * task.getTaskLength() / elapsedTime);
-                    altLoss = altValue[0].altPos - altValue[task.coords.length - 1].altPos;
-                    taskreport +="<br/>Height loss: " + altLoss + " " + altValue[0].descriptor;
-                    if (prefs.units.altitude !== 'mt') {
-                        if (prefs.altPrefs.source === 'P') {
-                            altLoss = flight.pressureAltitude[taskData.turnIndices[0]] - flight.pressureAltitude[taskData.turnIndices[task.coords.length - 1]];
-                        }
-                        else {
-                            altLoss = flight.gpsAltitude[taskData.turnIndices[0]] - flight.gpsAltitude[taskData.turnIndices[task.coords.length - 1]];
-                        }
-                        taskreport+=" (" + altLoss + "m)";
-                    }
-                }
-                else { // GPS landout
-                    if (taskData.npoints > 0) {
-                        taskEndIndex=taskData.bestPoint;
-                         taskreport+="<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint);
-                        taskreport+="<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]);
-                        taskreport+="<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance);
-                        mapControl.pushPin(flight.latLong[taskData.bestPoint]);
-                    }
-                }
-            return  taskreport;
+        $('#tasklength').html("<b>Task size:</b> " + task.aatRange + "&emsp;<b>Time: </b>" + Math.floor(task.aatMins / 60) + "hrs " + task.aatMins % 60 + "mins");
     }
 
-   function  showAatPerformance(taskData) {
-       var altValue;
-       var taskreport='';
-       var elapsedTime;
-       var i;
-       for(i=1; i < taskData.turnIndices.length; i++) {
-           mapControl.addBlueMarker(flight.latLong[taskData.turnIndices[i]]);
-       }
-       mapControl.addBlueMarker(taskData.turnIndices);
-       elapsedTime=flight.recordTime[taskData.bestPoint] - flight.recordTime[taskData.turnIndices[0]];
-        taskreport+="<br/>Start: " + showLocalTime(taskData.turnIndices[0]) + ": Altitude: ";
-        altValue = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[0]], flight.gpsAltitude[taskData.turnIndices[0]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
-        taskreport += altValue.altPos + altValue.descriptor;
-         if (taskData.status ==='finished') { //task completed
-            taskreport+="<br/>Finish: " + showLocalTime(taskData.turnIndices[task.coords.length-1]) + ": Altitude: "; 
-             altValue = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[task.coords.length-1]], flight.gpsAltitude[taskData.turnIndices[task.coords.length-1]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
-             taskreport += altValue.altPos + altValue.descriptor;
-             taskreport += "<br><br>Distance flown: " + prefs.showDistance(taskData.scoreDistance);
-             taskreport +="<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime);
-             taskreport +="<br/>Speed: " + prefs.showTaskSpeed(3600 * taskData.scoreDistance/ elapsedTime);
-         }
-         
-         else {
-             if(taskData.status ==='landout') {
-                taskreport +="<br/><br/>GPS Landout at: " +  showLocalTime(taskData.bestPoint);
-             }
-           else  {
-                  taskreport +="<br/><br/>Timed out at: " +  showLocalTime(taskData.bestPoint);
-             }
-            taskreport+="<br/>at: " + utils.showFormat(flight.latLong[taskData.bestPoint]);
-           taskreport += "<br><br>Scoring distance: " + prefs.showDistance(taskData.scoreDistance);
-           mapControl.pushPin(flight.latLong[taskData.bestPoint]);
-         }  
+
+    function showTradPerformance(taskData) {
+        var i;
+        var altValue = [];
+        var taskEndIndex;
+        var altLoss;
+        var taskreport = '';
+        for (i = 0; i < task.coords.length; i++) {
+            taskreport += "<br/>" + task.labels[i] + ": ";
+            if (i < taskData.npoints) {
+                taskreport += showLocalTime(taskData.turnIndices[i]) + ": Altitude: ";
+                altValue[i] = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[i]], flight.gpsAltitude[taskData.turnIndices[i]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+                taskreport += altValue[i].altPos + altValue[i].descriptor;
+            }
+            else {
+                taskreport += "No control";
+            }
+        }
+        if (taskData.npoints === task.coords.length) { //task completed
+            taskreport += "<br/><br/>" + prefs.showDistance(task.getTaskLength()) + "  task completed";
+            taskEndIndex = taskData.turnIndices[taskData.npoints - 1];
+            var elapsedTime = flight.recordTime[taskEndIndex] - flight.recordTime[taskData.turnIndices[0]];
+            taskreport += "<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime);
+            taskreport += "<br/>Speed: " + prefs.showTaskSpeed(3600 * task.getTaskLength() / elapsedTime);
+            altLoss = altValue[0].altPos - altValue[task.coords.length - 1].altPos;
+            taskreport += "<br/>Height loss: " + altLoss + " " + altValue[0].descriptor;
+            if (prefs.units.altitude !== 'mt') {
+                if (prefs.altPrefs.source === 'P') {
+                    altLoss = flight.pressureAltitude[taskData.turnIndices[0]] - flight.pressureAltitude[taskData.turnIndices[task.coords.length - 1]];
+                }
+                else {
+                    altLoss = flight.gpsAltitude[taskData.turnIndices[0]] - flight.gpsAltitude[taskData.turnIndices[task.coords.length - 1]];
+                }
+                taskreport += " (" + altLoss + "m)";
+            }
+        }
+        else { // GPS landout
+            if (taskData.npoints > 0) {
+                taskEndIndex = taskData.bestPoint;
+                taskreport += "<br/><br/>\"GPS Landing\" at: " + showLocalTime(taskData.bestPoint);
+                taskreport += "<br/>Position: " + utils.showFormat(flight.latLong[taskData.bestPoint]);
+                taskreport += "<br/>Scoring distance: " + prefs.showDistance(taskData.scoreDistance);
+                mapControl.pushPin(flight.latLong[taskData.bestPoint]);
+            }
+        }
         return taskreport;
     }
-    
+
+    function showAatPerformance(taskData) {
+        var altValue;
+        var taskreport = '';
+        var elapsedTime;
+        var i;
+        for (i = 1; i < taskData.turnIndices.length; i++) {
+            mapControl.addBlueMarker(flight.latLong[taskData.turnIndices[i]]);
+        }
+        elapsedTime = flight.recordTime[taskData.bestPoint] - flight.recordTime[taskData.turnIndices[0]];
+        taskreport += "<br/>Start: " + showLocalTime(taskData.turnIndices[0]) + ": Altitude: ";
+        altValue = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[0]], flight.gpsAltitude[taskData.turnIndices[0]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+        taskreport += altValue.altPos + altValue.descriptor;
+        if (taskData.status === 'finished') { //task completed
+            taskreport += "<br/>Finish: " + showLocalTime(taskData.turnIndices[task.coords.length - 1]) + ": Altitude: ";
+            altValue = prefs.showAltitude(flight.pressureAltitude[taskData.turnIndices[task.coords.length - 1]], flight.gpsAltitude[taskData.turnIndices[task.coords.length - 1]], flight.takeOff.pressure, flight.takeOff.gps, flight.baseElevation);
+            taskreport += altValue.altPos + altValue.descriptor;
+            taskreport += "<br><br>Distance flown: " + prefs.showDistance(taskData.scoreDistance);
+            taskreport += "<br/>Elapsed time: " + utils.unixToPaddedString(elapsedTime);
+            taskreport += "<br/>Speed: " + prefs.showTaskSpeed(3600 * taskData.scoreDistance / elapsedTime);
+        }
+
+        else {
+            if (taskData.status === 'landout') {
+                taskreport += "<br/><br/>GPS Landout at: " + showLocalTime(taskData.bestPoint);
+            }
+            else {
+                taskreport += "<br/><br/>Timed out at: " + showLocalTime(taskData.bestPoint);
+            }
+            taskreport += "<br/>at: " + utils.showFormat(flight.latLong[taskData.bestPoint]);
+            taskreport += "<br><br>Scoring distance: " + prefs.showDistance(taskData.scoreDistance);
+            mapControl.pushPin(flight.latLong[taskData.bestPoint]);
+        }
+        return taskreport;
+    }
+
     module.exports = {
         setSectors: function() {
             var sectors = {
@@ -226,37 +232,37 @@ function waitForMap(interval,counter) {
                 finishtype: $("input[name=finishtype]:checked").val()
             };
             var saveit = $('#savesectors').prop('checked');
-            
+
             if (prefs.setSectors(sectors, saveit)) {
-        if( $("input[name='tptype']:checked").val()==='trad') {
-              task.setSectorType('trad');
-               if(task) {
-                    task.setLength();
-                    $('#tasklength').text("Task distance: " + prefs.showDistance(task.getTaskLength()));
-                   }
-             }  
-            else {
-               task.setSectorType('aat');
-               var sectorSize=[];
-               var valsOk= true;
-               var aatmins;
-               $('#aatinfo').find('input').each(function () {
-                 if($.isNumeric(this.value)) {
-                        sectorSize.push(this.value);
-                 }
-                 else {
-                     valsOk=false;
-                 }
-                });
-               aatmins=parseInt(60*$('#aathrs').val()) + parseInt($('#aatmins').val());
-               if(!(valsOk) || !(aatmins))  {
-                   alert("Enter valid radii and task time");
-               }
-               else {
-             task.setAat(sectorSize,aatmins);
-             addAatInfo();
-               }
-          }
+                if ($("input[name='tptype']:checked").val() === 'trad') {
+                    task.setSectorType('trad');
+                    if (task) {
+                        task.setLength();
+                        $('#tasklength').text("Task distance: " + prefs.showDistance(task.getTaskLength()));
+                    }
+                }
+                else {
+                    task.setSectorType('aat');
+                    var sectorSize = [];
+                    var valsOk = true;
+                    var aatmins;
+                    $('#aatinfo').find('input').each(function() {
+                        if ($.isNumeric(this.value)) {
+                            sectorSize.push(this.value);
+                        }
+                        else {
+                            valsOk = false;
+                        }
+                    });
+                    aatmins = parseInt(60 * $('#aathrs').val()) + parseInt($('#aatmins').val());
+                    if (!(valsOk) || !(aatmins)) {
+                        alert("Enter valid radii and task time");
+                    }
+                    else {
+                        task.setAat(sectorSize, aatmins);
+                        addAatInfo();
+                    }
+                }
                 mapControl.addSectors();
                 $('#sectordefs').hide();
             }
@@ -323,8 +329,8 @@ function waitForMap(interval,counter) {
             else {
                 $("input[name=enldetect][value='Off']").prop("checked", true);
             }
-            $('#enlthreshold').val(enlObj.threshold),
-                $('#enltime').val(enlObj.duration)
+            $('#enlthreshold').val(enlObj.threshold);
+            $('#enltime').val(enlObj.duration);
         },
 
         showPreferences: function() {
@@ -446,7 +452,7 @@ function waitForMap(interval,counter) {
             if (flightMode === "Cruising") {
                 displaySentence += " <b>Ground&nbsp;speed:</b>&nbsp;" + prefs.showCruise(flight.groundSpeed[index]);
             }
-            displaySentence+=index;
+            displaySentence += index;
             $('#timePositionDisplay').html(displaySentence);
             var xval = 1000 * (flight.recordTime[index] + flight.timeZone.offset);
             var yval = altInfo.altPos;
@@ -508,7 +514,7 @@ function waitForMap(interval,counter) {
             else {
                 $('#P').attr('disabled', false);
             }
-            waitForMap(10,0);        //Map load is asyncronous- need to check it's available
+            waitForMap(10, 0); //Map load is asyncronous- need to check it's available
             $('#righthalf').css('visibility', 'visible');
             $('#infobox').css('visibility', 'visible');
             var tzBack = this.getGeoInfo.bind(this);
@@ -536,7 +542,7 @@ function waitForMap(interval,counter) {
                     zapTask();
                 }
             }
-             document.getElementById('map').scrollIntoView();
+            document.getElementById('map').scrollIntoView();
             $('#timeSlider').val(0);
             $('#timeSlider').prop('max', flight.recordTime.length - 1);
         },
@@ -545,7 +551,7 @@ function waitForMap(interval,counter) {
             if (flight) {
                 mapControl.setBounds(flight.bounds);
             }
-             $('#zoomdiv').css('zIndex',1);
+            $('#zoomdiv').css('zIndex', 1);
         },
 
         showAltPreferences: function() {
@@ -561,9 +567,6 @@ function waitForMap(interval,counter) {
             $('#taskdata').show();
             var takeOffIndex = flight.getTakeOffIndex();
             var landingIndex = flight.getLandingIndex();
-            var altValue = [];
-            var altLoss;
-            var taskEndIndex;
             var taskreport;
 
             $('#taskcalcs').html("Take off:  " + showLocalTime(takeOffIndex) + "<br>");
@@ -571,26 +574,28 @@ function waitForMap(interval,counter) {
                 mapControl.clearPin();
                 var analyse = require('./analyse');
                 var taskData = analyse.assessTask();
-               if(task.tasktype==='trad') {
-                    taskreport= showTradPerformance(taskData);
-                 }
-                 else {
-                     taskreport=showAatPerformance(taskData);
-                 }
+                if (task.tasktype === 'trad') {
+                    taskreport = showTradPerformance(taskData);
+                }
+                else {
+                    taskreport = showAatPerformance(taskData);
+                }
                 $('#taskcalcs').append(taskreport);
-  
-            $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
-            var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
-            $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
-            if(taskData.npoints > 0) {
-                 var thermalInfo=analyse.getThermalCount(taskData.turnIndices[0],taskData.bestPoint);
-                $('#taskcalcs').append("<br/><br/><b>On Task: </b>");
-                 $('#taskcalcs').append("<br/>Time  circling: " + Math.floor(thermalInfo.circleTime/60) + " mins " + thermalInfo.circleTime%60 + " secs");
-                 var altInfo=prefs.displayAlt(thermalInfo.heightGain);
-                 $('#taskcalcs').append("<br/>Height gained: " + altInfo.showval + " " + altInfo.descriptor);
-                  $('#taskcalcs').append("<br/>Average climb: " + prefs.showClimb(thermalInfo.heightGain/thermalInfo.circleTime));
-                  $('#taskcalcs').append("<br/><br/>Task wind: " + prefs.showCruise(thermalInfo.windSpeed) + " from " + Math.round(thermalInfo.windDirection) + "&deg;");
-            }
+
+                $('#taskcalcs').append("<br/><br/>Landing: " + showLocalTime(landingIndex));
+                var flightSeconds = flight.recordTime[landingIndex] - flight.recordTime[takeOffIndex];
+                $('#taskcalcs').append("<br/><br/>Flight time: " + Math.floor(flightSeconds / 3600) + "hrs " + utils.pad(Math.round(flightSeconds / 60) % 60) + "mins");
+                if (taskData.npoints > 0) {
+                    var thermalInfo = analyse.getThermalCount(taskData.turnIndices[0], taskData.bestPoint);
+                    $('#taskcalcs').append("<br/><br/><b>On Task: </b>");
+                    $('#taskcalcs').append("<br/>Time  circling: " + Math.floor(thermalInfo.circleTime / 60) + " mins " + thermalInfo.circleTime % 60 + " secs");
+                    var altInfo = prefs.displayAlt(thermalInfo.heightGain);
+                    $('#taskcalcs').append("<br/>Height gained: " + altInfo.showval + " " + altInfo.descriptor);
+                    if (thermalInfo.circleTime > 0) {
+                        $('#taskcalcs').append("<br/>Average climb: " + prefs.showClimb(thermalInfo.heightGain / thermalInfo.circleTime));
+                    }
+                    $('#taskcalcs').append("<br/><br/>Task wind: " + prefs.showCruise(thermalInfo.windSpeed) + " from " + Math.round(thermalInfo.windDirection) + "&deg;");
+                }
             }
         },
 
@@ -630,53 +635,52 @@ function waitForMap(interval,counter) {
             $('#thermalClimb').text(prefs.showClimb(heightGain / (thermalData.exitTime - thermalData.entryTime)));
             $('#windInfo').text(prefs.showCruise(windInfo.speed) + " from " + Math.round(windInfo.direction));
         },
-   
+
         tpchange: function(tptype) {
             var i;
-            if(tptype==='aat') {
-            if(!task.names.length) {
-            alert("Define turning points first");
-             $("#trad").prop("checked", true);
-               }
+            if (tptype === 'aat') {
+                if (!task.names.length) {
+                    alert("Define turning points first");
+                    $("#trad").prop("checked", true);
+                }
+                else {
+                    $('#aatinfo').html('');
+                    $('#aathrs').val(2);
+                    $('#aatmins').val('30');
+                    for (i = 1; i < task.names.length - 1; i++) {
+                        $('#aatinfo').append('<tr><th>' + task.labels[i] + "</th><td>Circle radius:   <input type='text' id='aatrad" + i + "'> Km</td></tr>");
+                    }
+                    $('#tradtp').hide();
+                    $('#aatdef').show();
+                }
+            }
             else {
-             $('#aatinfo').html('');
-             $('#aathrs').val(2);
-             $('#aatmins').val('30');
-            for (i = 1; i < task.names.length-1; i++) {
-                 $('#aatinfo').append('<tr><th>' + task.labels[i] + "</th><td>Circle radius:   <input type='text' id='aatrad" + i + "'> Km</td></tr>");
-            }   
-            $('#tradtp').hide();
-             $('#aatdef').show();
+                $('#tradtp').show();
+                $('#aatdef').hide();
+                task.setSectorType('trad');
             }
-            }
-        else {
-             $('#tradtp').show();
-             $('#aatdef').hide();
-              task.setSectorType('trad');
-        }
         },
- 
-         resetMeasure: function() {
-             $('#measurer p').text('');
-             $('#measure1').text("Click on start point");
-             measureTool.status='empty';
-            measureTool.start=null;
-            measureTool.finish=null;
+
+        resetMeasure: function() {
+            $('#measurer p').text('');
+            $('#measure1').text("Click on start point");
+            measureTool.status = 'empty';
+            measureTool.start = null;
+            measureTool.finish = null;
             mapControl.clearMeasureFlags();
-         },
- 
+        },
+
         measure: function() {
             this.resetMeasure();
             $('#measurer').show();
             mapControl.activate(measureClick);
         },
 
-       zapMeasure: function() {
-           mapControl.unclick();
-       },
- 
+        zapMeasure: function() {
+            mapControl.unclick();
+        },
+
         reportHeightInfo: function(index) {
-            var elevation;
             var qnhMetric;
             var qnh;
             if (flight.baseElevation !== null) {

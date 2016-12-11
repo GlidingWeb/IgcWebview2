@@ -14,16 +14,16 @@
         circle_bases: []
     };
     var engineLines = [];
-    var blueMarkers= [];
+    var blueMarkers = [];
     var pin;
     var finishFlag;
     var startFlag;
-    
-    function putMarker(marker,coords) {
+
+    function putMarker(marker, coords) {
         marker.setPosition(coords);
         marker.setMap(mapObj);
     }
-    
+
     function deleteEnl() {
         var i;
         for (i = 0; i < engineLines.length; i++) {
@@ -154,7 +154,7 @@
             };
 
             mapObj = new google.maps.Map($('#map').get(0), mapOpt);
-            
+
             gliderMarker = new google.maps.Marker({
                 icon: 'Icons/glidericon.png',
                 clickable: false,
@@ -166,38 +166,38 @@
                 url: 'Icons/pin.png',
                 anchor: new google.maps.Point(4, 49)
             };
-            
+
             var finishIcon = {
                 url: 'Icons/finish.png',
                 anchor: new google.maps.Point(0, 30)
             };
-    
-             var startIcon = {
+
+            var startIcon = {
                 url: 'Icons/start.png',
                 anchor: new google.maps.Point(5, 30)
             };
-            
-        blueIcon= {
-           url: 'Icons/blue-dot.png',
-           anchor: new google.maps.Point(16, 32),
-       };
-            
-        pin = new google.maps.Marker({
+
+            blueIcon = {
+                url: 'Icons/blue-dot.png',
+                anchor: new google.maps.Point(16, 32),
+            };
+
+            pin = new google.maps.Marker({
                 icon: pinicon,
                 clickable: false
             });
-        
-        finishFlag= new google.maps.Marker({
+
+            finishFlag = new google.maps.Marker({
                 icon: finishIcon,
                 clickable: false
             });
-        
-        startFlag= new google.maps.Marker({
+
+            startFlag = new google.maps.Marker({
                 icon: startIcon,
                 clickable: false
             });
-        
-           return true;
+
+            return true;
         },
 
         setBounds: function(bounds) {
@@ -205,9 +205,14 @@
         },
 
         addTrack: function(track) {
+            var i;
             if (trackline) {
                 trackline.setMap(null);
             }
+            for (i = 0; i < blueMarkers.length; i++) {
+                blueMarkers[i].setMap(null);
+            }
+            blueMarkers = [];
             trackline = new google.maps.Polyline({
                 path: track,
                 strokeColor: 'blue',
@@ -273,6 +278,7 @@
             var circle;
             var line;
             var sector;
+            var finish;
             zapSectors();
             var task = require('./task');
             if (task.names.length > 0) {
@@ -280,18 +286,18 @@
                 line = drawLine(task.coords[0], task.bearing[1], prefs.startrad);
                 sectorfeatures.push(line);
                 for (i = 1; i < task.names.length - 1; i++) {
-                    if(task.tasktype==='trad') {
-                    if (prefs.use_barrel) {
-                        circle = sectorCircle(task.coords[i], prefs.tprad);
-                        sectorfeatures.push(circle);
+                    if (task.tasktype === 'trad') {
+                        if (prefs.use_barrel) {
+                            circle = sectorCircle(task.coords[i], prefs.tprad);
+                            sectorfeatures.push(circle);
+                        }
+                        if (prefs.use_sector) {
+                            sector = drawSector(task.coords[i], task.bearing[i], task.bearing[i + 1], prefs.sector_angle, prefs.sector_rad);
+                            sectorfeatures.push(sector);
+                        }
                     }
-                    if (prefs.use_sector) {
-                        sector = drawSector(task.coords[i], task.bearing[i], task.bearing[i + 1], prefs.sector_angle, prefs.sector_rad);
-                        sectorfeatures.push(sector);
-                    }
-                    }
-                    else{
-                        circle=sectorCircle(task.coords[i],task.aatradii[i-1]);
+                    else {
+                        circle = sectorCircle(task.coords[i], task.aatradii[i - 1]);
                         sectorfeatures.push(circle);
                     }
                 }
@@ -333,19 +339,19 @@
                 engineLines[i].setMap(mapObj);
             }
         },
-         
-         addBlueMarker: function(coords) {
-                 taskmarker = new google.maps.Marker({
-                    icon:blueIcon,
-                    position: coords,
-                    map: mapObj,
-                    clickable: false,
-                    zIndex: 50
-                });
-              taskmarker.setMap(mapObj);
-              blueMarkers.push(taskmarker);
-         },
- 
+
+        addBlueMarker: function(coords) {
+            var taskmarker = new google.maps.Marker({
+                icon: blueIcon,
+                position: coords,
+                map: mapObj,
+                clickable: false,
+                zIndex: 50
+            });
+            taskmarker.setMap(mapObj);
+            blueMarkers.push(taskmarker);
+        },
+
         addTask: function(tplist, zoomto) {
             var j;
             this.zapTask();
@@ -379,44 +385,48 @@
             mapObj.panTo(tpoint);
             mapObj.setZoom(13);
         },
- 
+
         pushPin: function(coords) {
-            putMarker(pin,coords);
+            putMarker(pin, coords);
         },
 
         resizeMap: function() {
-            google.maps.event.trigger(mapObj,'resize');
+            google.maps.event.trigger(mapObj, 'resize');
         },
-        
-         clearPin: function() {
-             pin.setMap(null);
-         },
-   
-       clearMeasureFlags: function() {
-           startFlag.setMap(null);
-           finishFlag.setMap(null);
-       }, 
- 
+
+        clearPin: function() {
+            pin.setMap(null);
+        },
+
+        clearMeasureFlags: function() {
+            startFlag.setMap(null);
+            finishFlag.setMap(null);
+        },
+
         showFinish: function(coords) {
-             putMarker(finishFlag,coords);
+            putMarker(finishFlag, coords);
         },
- 
+
         showStart: function(coords) {
-             putMarker(startFlag,coords);
+            putMarker(startFlag, coords);
         },
- 
+
         activate: function(param) {
-            mapObj.setOptions({draggableCursor:'pointer'});
+            mapObj.setOptions({
+                draggableCursor: 'pointer'
+            });
             mapObj.addListener('click', function(e) {
-             param(e.latLng.lat(),e.latLng.lng());
-             });
+                param(e.latLng.lat(), e.latLng.lng());
+            });
         },
- 
+
         unclick: function() {
             google.maps.event.clearListeners(mapObj, 'click');
-            mapObj.setOptions({draggableCursor:'hand'});
+            mapObj.setOptions({
+                draggableCursor: 'hand'
+            });
         },
- 
+
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);
             var gliderpos = new google.maps.LatLng(position);

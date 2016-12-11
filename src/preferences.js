@@ -7,6 +7,16 @@
     var MPS2KNOT = 1.9426025694;
     var MPS2FPM = 196.8503937;
     var KM2NM = 0.53961;
+    var sectors = {
+        startrad: 5, //start line radius
+        finrad: 1, //finish line radius
+        tprad: 0.5, //'beer can' radius
+        sector_rad: 20, //tp sector radius
+        sector_angle: 90, //tp sector
+        use_sector: true,
+        use_barrel: true,
+        finishtype: "line"
+    };
 
     var altPrefs = {
         altsource: 'P',
@@ -91,13 +101,6 @@
                 // If permission is denied, ignore the error.
             }
         }
-    }
-
-    function setConverter(unitObj, descriptor, multiplier, precision, abbr) {
-        unitObj.descriptor = descriptor;
-        unitObj.multiplier = multiplier;
-        unitObj.precision = precision;
-        unitObj.abbr = abbr;
     }
 
     module.exports = {
@@ -293,7 +296,6 @@
         showAltitude: function(pressureAlt, gpsAlt, toPressure, toGps, afElevation) {
             var takeoff;
             var source;
-            var multiplier;
             var metreval;
             if (this.altPrefs.altsource === 'P') {
                 metreval = pressureAlt;

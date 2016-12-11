@@ -1,11 +1,10 @@
 // This is the entry point for the build.  Contains basic user interaction code.
 (function() {
     var apiKeys = require('./apikeys');
-    var haveMap;
     window.ginit = function() { //Callback after maps api loads.  Must be in global scope
         $('#mapWrapper').show();
         var map = require('./mapctrl');
-        window.haveMap=map.initmap();
+        window.haveMap = map.initmap();
     };
 
     window.importTask = function(points) {
@@ -15,7 +14,7 @@
     };
 
 
-var doit;
+    var doit;
 
     var script = document.createElement('script');
     script.type = 'text/javascript';
@@ -32,17 +31,17 @@ var doit;
         var igcFile = require('./igc');
         preference.getStoredValues();
         present.showPreferences();
-        document.getElementById('help').scrollIntoView();     
+        document.getElementById('help').scrollIntoView();
         $("#igc").prop("checked", true); //Firefox ignores markup on refresh
 
         $('#help').click(function() {
             window.open("igchelp.html", "_blank");
         });
-        
-          $('#about').click(function () {
-          window.open("igcabout.html", "_blank");
+
+        $('#about').click(function() {
+            window.open("igcabout.html", "_blank");
         });
-                  
+
         $('#fileControl').change(function() {
             if (this.files.length > 0) {
                 var reader = new FileReader();
@@ -64,35 +63,35 @@ var doit;
             }
         });
 
-resizedw= function() {
-   if($('#righthalf').css('visibility')==='visible') {
-    var plot= require('./plotgraph');
-    var mapctrl=require('./mapctrl');
-    plot.replot();
-    mapctrl.resizeMap();
-}
-};
-    
-window.onresize = function(){
-  clearTimeout(doit);
-  doit = setTimeout(resizedw, 100);
-};
-        
+        var resizedw = function() {
+            if ($('#righthalf').css('visibility') === 'visible') {
+                var plot = require('./plotgraph');
+                var mapctrl = require('./mapctrl');
+                plot.replot();
+                mapctrl.resizeMap();
+            }
+        };
+
+        window.onresize = function() {
+            clearTimeout(doit);
+            doit = setTimeout(resizedw, 100);
+        };
+
         $('.closewindow').click(function() {
             $('.easyclose').hide();
             $('#timeSlider').focus();
         });
 
-  $('input[type=radio][name=tptype]').change(function() {
-      present.tpchange(this.value);
-      });
-  
+        $('input[type=radio][name=tptype]').change(function() {
+            present.tpchange(this.value);
+        });
+
         $('#closeSectorDef').click(function() {
             $('#aatinfo').html('');
-             $("#trad").prop("checked", true);
-             $('#tradtp').show();
+            $("#trad").prop("checked", true);
+            $('#tradtp').show();
         });
-        
+
         $('#timeSlider').on('input', function() {
             hiderest();
             var t = parseInt($(this).val(), 10);
@@ -131,7 +130,7 @@ window.onresize = function(){
             preference.setLengthUnits($(this).val());
             present.lengthChange();
         });
-    
+
         $('#cruiseunits').change(function() {
             preference.setCruiseUnits($(this).val());
         });
@@ -180,9 +179,9 @@ window.onresize = function(){
         $('#enldefaults').click(function() {
             present.showEnlPrefs('default');
         });
-        
-        $('#enlhelp').click(function () {
-          window.open("igchelp.html#enl", "_blank");
+
+        $('#enlhelp').click(function() {
+            window.open("igchelp.html#enl", "_blank");
         });
 
         $('#applyenl').click(function() {
@@ -229,46 +228,47 @@ window.onresize = function(){
             preference.setAltPrefs($("input[name='alttype']").filter(':checked').val(), $("input[name='altsource']").filter(':checked').val());
             present.altChange(parseInt($('#timeSlider').val(), 10));
         });
-          
-         $('#showgraph').click(function() {
-            $(this).parent().hide();
-            $('#map').css('zIndex',1);
-            $('#barogram').css('zIndex',10);
-             $('#showmap').show();
-         });
-         
-         $('#showmap').click(function() {
-             $('#map').css('zIndex', 10);
-             $('#barogram').css('zIndex',1);
-             $('#mapbuttons').show();;
-              $(this).hide();
-         });
-         
-         $('#showzoom').click(function() {
-             $('#zoomdiv').css('zIndex',25);
-             $('#zoomlabel').hide();
-         });
 
-          $('#measure').click(function() {
-              present.measure();
-         });
-         
-    $('#measurer :button').click(function () {
-        present.resetMeasure();
-});
-        
-    $('#closemeasure').click(function() {
-        present.zapMeasure();
-    });
-    
+        $('#showgraph').click(function() {
+            $(this).parent().hide();
+            $('#map').css('zIndex', 1);
+            $('#barogram').css('zIndex', 10);
+            $('#showmap').show();
+        });
+
+        $('#showmap').click(function() {
+            $('#map').css('zIndex', 10);
+            $('#barogram').css('zIndex', 1);
+            $('#mapbuttons').show();;
+            $(this).hide();
+        });
+
+        $('#showzoom').click(function() {
+            $('#zoomdiv').css('zIndex', 25);
+            $('#zoomlabel').hide();
+        });
+
+        $('#measure').click(function() {
+            present.measure();
+        });
+
+        $('#measurer :button').click(function() {
+            present.resetMeasure();
+        });
+
+        $('#closemeasure').click(function() {
+            present.zapMeasure();
+        });
+
         $('button.toggle').click(
-          function () {
-            $(this).next().toggle();
-            if ($(this).next().is(':visible')) {
-              $(this).text('Hide');
-            } else {
-              $(this).text('Show');
-            }
-          });
+            function() {
+                $(this).next().toggle();
+                if ($(this).next().is(':visible')) {
+                    $(this).text('Hide');
+                }
+                else {
+                    $(this).text('Show');
+                }
+            });
     });
 })();
