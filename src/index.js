@@ -8,12 +8,14 @@
     };
 
     window.importTask = function(points) {
+        debugger;
         var present = require('./presentation');
         present.showImported(points);
         return "Task Entered";
     };
-
-
+ 
+    window.name="igcview";
+ 
     var doit;
 
     var script = document.createElement('script');

@@ -83,7 +83,7 @@
     }
 
     function getFromPlanner(source) {
-        var planUrl = "../TaskMap/xcplan.php?version=" + source;
+        var planUrl = "../xcwebplan/xcplan.php?version=" + source;
         if ((!(planWindow)) || (planWindow.closed)) {
             planWindow = window.open(planUrl, "_blank");
         }
