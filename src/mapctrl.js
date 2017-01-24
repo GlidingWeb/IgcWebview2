@@ -15,6 +15,11 @@
     var engineLines = [];
     var pin;
 
+    function putMarker(marker, coords) {
+        marker.setPosition(coords);
+        marker.setMap(mapObj);
+    }
+    
     function deleteEnl() {
         var i;
         for (i = 0; i < engineLines.length; i++) {
@@ -156,11 +161,32 @@
                 url: 'Icons/pin.png',
                 anchor: new google.maps.Point(4, 48)
             };
+            
+            var finishIcon = {
+                url: 'Icons/finish.png',
+                anchor: new google.maps.Point(0, 30)
+            };
+
+            var startIcon = {
+                url: 'Icons/start.png',
+                anchor: new google.maps.Point(5, 30)
+            };
 
            pin = new google.maps.Marker({
                 icon: pinicon,
                 clickable: false
             });
+           
+             finishFlag = new google.maps.Marker({
+                icon: finishIcon,
+                clickable: false
+            });
+
+            startFlag = new google.maps.Marker({
+                icon: startIcon,
+                clickable: false
+            });
+           
             return true;
         },
 
@@ -328,8 +354,7 @@
         },
 
         pushPin: function(coords) {
-            pin.setPosition(coords);
-            pin.setMap(mapObj);
+            putMarker(pin, coords);
         },
 
         resizeMap: function() {
@@ -339,7 +364,36 @@
         clearPin: function() {
             pin.setMap(null);
         },
+ 
+        clearMeasureFlags: function() {
+            startFlag.setMap(null);
+            finishFlag.setMap(null);
+        },
 
+        showFinish: function(coords) {
+            putMarker(finishFlag, coords);
+        },
+
+        showStart: function(coords) {
+            putMarker(startFlag, coords);
+        },
+
+        activate: function(param) {
+            mapObj.setOptions({
+                draggableCursor: 'pointer'
+            });
+            mapObj.addListener('click', function(e) {
+                param(e.latLng.lat(), e.latLng.lng());
+            });
+        },
+
+        unclick: function() {
+            google.maps.event.clearListeners(mapObj, 'click');
+            mapObj.setOptions({
+                draggableCursor: 'hand'
+            });
+        },
+ 
         setTimeMarker: function(position) {
             gliderMarker.setPosition(position);
             var gliderpos = new google.maps.LatLng(position);

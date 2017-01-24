@@ -144,6 +144,7 @@
                </div>
             </div>
             <button id="analyse"> Analyse task</button>
+            <button id='measure'> Distance Measurement</button>
          </div>
          </div>
          </div>
@@ -160,7 +161,12 @@
          <p>
             <b>Start Line:</b><br/>Radius: <input id="startrad" type="text" value="5.0"/>Km
          </p>
+         <p><b>Sector type: </b>
+         <input type="radio" name="tptype" value="trad" id='trad' checked>  <label for='trad'>Traditional</label>
+            &nbsp;  <input type="radio" name="tptype" value="aat" id='aat'><label for='aat'>Aat</label>
+            </p>
          <p>
+         <div id='tradtp'>
             <b>Turning Points:</b><br/>
             <div class='checklabel'>Circle:</div>
             <div class="modcheck">
@@ -180,6 +186,15 @@
             </select>
             &nbsp;radius: <input id="tpsectorrad" type="text" value="15"/>Km  
          </p>
+         </div>
+         <div id='aatdef'>
+         <table id='aatinfo'>
+         </table>
+         <p><b>Time:</b> 
+         <input type='number' id='aathrs' min='0' max='9' step='1'/> Hrs&#8196;
+          <input type='number' id='aatmins' min='0' max='59' step='1'/>  Mins
+         </p>
+         </div>
          <p>
             <b>Finish:</b><br/>Radius: <input id="finishrad" type="text" value="1.0"/> Km
             <input type="radio" name="finishtype" value="line" id='line' checked>  <label for='line'>Line</label>
@@ -282,6 +297,14 @@
          <p><b>Average climb rate: </b> <span id='thermalClimb'></span></p>
          <p><b>Estimated wind:</b> <span id='windInfo'></span>&deg;</p> 
          <button class="floatright closewindow">Close</button>
+      </div>
+    <div id='measurer'  class='easyclose'>
+          <h4>Distance Measuring tool:</h4>
+          <p id='measure1'></p>
+           <p id='measure2'></p>
+           <p id='measure3'></p>
+           <button id='remeasure'>Reset</button>
+         <button id='closemeasure' class="floatright closewindow">Close</button>
       </div>
       <script src="bundle.js"></script>
    </body>

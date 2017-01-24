@@ -9,6 +9,36 @@
     var task = require('./task.js');
     var planWindow;
 
+     var measureTool = {
+        status: 'empty',
+        start: null,
+        end: null
+    };
+
+    function measureClick(lat, lng) {
+        var coords = {
+            lat: lat,
+            lng: lng
+        };
+        var calc;
+        switch (measureTool.status) {
+            case 'empty':
+                mapControl.showStart(coords);
+                $('#measure1').html("Start: " + utils.showFormat(coords));
+                $('#measure2').text("Click on finish point");
+                measureTool.status = 'started';
+                measureTool.start = coords;
+                break;
+            case 'started':
+                mapControl.showFinish(coords);
+                measureTool.end = coords;
+                calc = utils.getTrackData(measureTool.start, measureTool.end);
+                $('#measure2').html("Finish: " + utils.showFormat(coords));
+                $('#measure3').html("Distance: " + prefs.showDistance(calc.distance) + "<br/>Initial bearing: " + calc.bearing + "&deg;");
+                break;
+        }
+    }
+    
     function zapTask() {
         $('#taskentry').hide();
         $('#task').hide();
@@ -514,6 +544,25 @@
             $('#windInfo').text(prefs.showCruise(windInfo.speed) + " from " + Math.round(windInfo.direction));
         },
 
+       resetMeasure: function() {
+            $('#measurer p').text('');
+            $('#measure1').text("Click on start point");
+            measureTool.status = 'empty';
+            measureTool.start = null;
+            measureTool.finish = null;
+            mapControl.clearMeasureFlags();
+        },
+
+        measure: function() {
+            this.resetMeasure();
+            $('#measurer').show();
+            mapControl.activate(measureClick);
+        },
+
+        zapMeasure: function() {
+            mapControl.unclick();
+        },
+ 
         reportHeightInfo: function(index) {
             var qnhMetric;
             var qnh;
