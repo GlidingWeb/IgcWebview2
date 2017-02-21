@@ -137,6 +137,9 @@
         if ((bestLeg === curLeg) && (curLeg < task.coords.length)) { //ignore this if the best distance was at the last TP, don't bother if finished
             bestSoFar = distanceToNext - utils.getTrackData(flight.latLong[bestIndex], task.coords[curLeg]).distance; //recalculate using ellipsoid model
         }
+        if(bestLeg > curLeg) {
+            curLeg=bestLeg;
+        }
         return {
             npoints: curLeg,
             turnIndices: tpindices,

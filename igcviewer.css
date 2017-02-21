@@ -474,7 +474,7 @@ position: absolute;
 left: 30px;
 top: 8vh;
 width: calc(100% - 70px);
-background-color: white;
+visibility: hidden;
 z-index: 1;
 }
 
