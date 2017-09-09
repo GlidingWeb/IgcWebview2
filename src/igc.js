@@ -257,7 +257,7 @@
                 name: 'Logger serial number',
                 value: manufacturerInfo.serial
             });
-            var extractDate = infile.match(/H[FPO]DTE([\d]{6})/);
+            var extractDate = infile.match(/H[FPO]DTE(?:DATE:)?([\d]{6})/);
             if (extractDate) {
                 var dateRecord = extractDate[1];
             }
